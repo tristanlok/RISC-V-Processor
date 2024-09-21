@@ -3,10 +3,13 @@
 # pipe the result into stdout for now
 
 # Get the project directory
-# set project_directory [get_project_directory] (PROD)
+if {[catch {get_project_directory}]} {
+    set project_directory [pwd]
+} else {
+    set project_directory [get_project_directory]
+}
 
-# Get the project directory (TEST)
-set project_directory "/mnt/c/Users/seany/documents/github/risc-v-processor/risc-v-processor/scripts/dev/"
+# set project_directory [get_project_directory] (PROD)
 
 # Get all SystemVerilog files in the project directory
 set sv_files [glob -nocomplain -directory $project_directory *.sv]
