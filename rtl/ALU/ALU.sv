@@ -73,7 +73,7 @@ end
 // zero flag
 always_comb begin
 
-	zeroFlag_out = ~|adderResult;
+	zeroFlag_out = ~|result_out;
 
 end
 
