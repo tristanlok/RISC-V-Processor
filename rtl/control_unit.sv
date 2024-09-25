@@ -17,6 +17,22 @@ enum logic [3:0] {
 	OP_OR	 = 2'b11
 } Alu_OP;
 
+// intermediates
+logic [7] opcode;
+logic [3] funct3;
+logic [7] funct7;
+
+// extract sections from instruction
+always_comb begin
+   opcode = instruction[6:0];
+	funct3 = instruction[14:12];
+	funct7 = instruction[31:25];
+end   
+
+always_comb begin
+   case(opcode)
+      7'b0000011: begin //I-TYPE
+
 always_comb begin
 	case (
 
