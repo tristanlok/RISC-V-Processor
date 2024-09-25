@@ -15,14 +15,13 @@ Internal Functions:
 module ALU(
 	input logic [63:0] operand1_in,
 	input logic [63:0] operand2_in,
-	input logic [2:0] aluOpcode_in,
+	input logic [2:0] aluOpcode_in, //check this width later
 	output logic [63:0] result_out,
 	output logic zeroFlag_out
 );
 
 logic subEnable;
-logic [63:0] operand2Modified;
-
+logic [63:0] operand2Modified; // inverted version of operand2_in if subtraction is enabled for 2's complement
 logic [63:0] orResult;
 logic [63:0] andResult;
 logic [63:0] adderResult;
