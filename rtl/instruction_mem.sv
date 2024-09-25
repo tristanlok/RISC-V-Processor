@@ -16,8 +16,16 @@ module instruction_mem #(
 // Create the instruction memory
 logic [WORD_SIZE - 1:0][7:0] ram [0:MEM_DEPTH - 1]; // Creates MEM_DEPTH number of 32bit rows in memory
 
+logic [MEM_DEPTH-1:0] wordNumber;
+
+// calculating word number by dividing mem address by 4
 always_comb begin
-	data_o = ram[mem_addr >> WORD_SIZE_POW];
+	wordNumber = [mem_addr >> WORD_SIZE_POW];
+end
+
+// read instruction	
+always_comb begin
+	data_o = ram[wordNumber];
 end
 	
 endmodule
