@@ -10,6 +10,14 @@ module control_unit (
 	output			branch_ctrl
 );
 
-assign 
+enum logic [3:0] {
+	OP_ADD = 2'b00,
+	OP_SUB = 2'b01,
+	OP_AND = 2'b10,
+	OP_OR	 = 2'b11
+} Alu_OP;
+
+always_comb begin
+	case (
 
 endmodule
