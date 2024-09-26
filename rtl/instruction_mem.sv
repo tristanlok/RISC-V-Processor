@@ -1,16 +1,16 @@
 module instruction_mem #(
-	localparam	ADDR_WIDTH = 64, 							// Each Instruction Address is 64bit
-	localparam	DATA_WIDTH = 32, 							// Each Instruction Data is 32bit
-	
-	localparam	WORD_SIZE_POW = 2,						// Size of Word (in bytes) in terms of power of 2 (4)
-	localparam 	WORD_SIZE = 1 << WORD_SIZE_POW,		// Size of Word in bytes (1 * 2^2)
-	
-	parameter	MEM_DEPTH_POW = 10,						// Default depth of instruction memory 2^10 * 4 = 4 KB
-	localparam	MEM_DEPTH = 1 << MEM_DEPTH_POW		// Number of instructions stored in instruction memory	
+   localparam  ADDR_WIDTH = 64,                    // Each Instruction Address is 64bit
+   localparam  DATA_WIDTH = 32,                    // Each Instruction Data is 32bit
+   
+   localparam  WORD_SIZE_POW = 2,                  // Size of Word (in bytes) in terms of power of 2 (4)
+   localparam  WORD_SIZE = 1 << WORD_SIZE_POW,     // Size of Word in bytes (1 * 2^2)
+   
+   parameter   MEM_DEPTH_POW = 10,                 // Default depth of instruction memory 2^10 * 4 = 4 KB
+   localparam  MEM_DEPTH = 1 << MEM_DEPTH_POW      // Number of instructions stored in instruction memory   
 ) (
-	input		logic [63:0] mem_addr,
-	
-	output	logic [31:0] data_o
+   input    logic [63:0] mem_addr,
+   
+   output   logic [31:0] data_o
 );
 
 // Create the instruction memory
@@ -20,12 +20,12 @@ logic [MEM_DEPTH-1:0] wordNumber;
 
 // calculating word number by dividing mem address by 4
 always_comb begin
-	wordNumber = [mem_addr >> WORD_SIZE_POW];
+   wordNumber = [mem_addr >> WORD_SIZE_POW];
 end
 
-// read instruction	
+// read instruction  
 always_comb begin
-	data_o = ram[wordNumber];
+   data_o = ram[wordNumber];
 end
-	
+   
 endmodule
