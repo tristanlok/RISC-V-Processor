@@ -20,7 +20,7 @@ logic [MEM_DEPTH-1:0] wordNumber;
 
 // On Initialization, Use $readmemh for hexadecimal format
 initial begin
-	$readmemh("instructions.mem", ram); // Load instructions from the file
+   $readmemh("instructions.mem", ram); // Load instructions from the file
 end
 
 // calculating word number by dividing mem address by 4
