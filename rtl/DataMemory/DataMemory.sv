@@ -63,12 +63,12 @@ always_comb begin
 end
 
 // synchronous writing
-always_ff@(posedge clk_in) begin
+always_ff @(posedge clk_in) begin
    
    if(writeEnable_in) begin
       ram[wordNumber] <= data_in; //writes the entire word to the address -> should be byte addressable in the future (see example below)
    end
-   
+		
 end
    
 endmodule 
