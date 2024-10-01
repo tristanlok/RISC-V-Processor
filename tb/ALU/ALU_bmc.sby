@@ -15,7 +15,7 @@ read -formal FullAdder8b.sv
 read -formal FullAdder16b.sv
 read -formal FullAdder32b.sv
 read -formal FullAdder64b.sv
-prep -top ALU
+prep -top ALU_assertions
 
 [files]
 ../../rtl/ALU/ALU.sv

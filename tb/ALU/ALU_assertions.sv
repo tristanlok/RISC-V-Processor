@@ -2,9 +2,12 @@ module ALU_assertions(
     input logic [63:0] operand1_in,
     input logic [63:0] operand2_in,
     input logic [2:0] aluOpcode_in,
-    input logic [63:0] result_out,
-    input logic zeroFlag_out
+    output logic [63:0] result_out,
+    output logic zeroFlag_out
 );
+
+// instantiate DUT
+ALU DUT (.operand1_in, .operand2_in, .aluOpcode_in, .result_out, .zeroFlag_out);
 
 // Check for addition
 always_comb begin
