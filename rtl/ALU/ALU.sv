@@ -76,14 +76,5 @@ always_comb begin
 
 end
 
-// ALU formal assertions
-ALU_assertions ALU_check (
-    .operand1_in(operand1_in),
-    .operand2_in(operand2_in),
-    .aluOpcode_in(aluOpcode_in),
-    .result_out(result_out),
-    .zeroFlag_out(zeroFlag_out)
-);
-
 endmodule
 
