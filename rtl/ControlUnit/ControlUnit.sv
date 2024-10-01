@@ -1,4 +1,4 @@
-module control_unit import temp::*; ( // 1'b0 = OFF 1'b1 = ON
+module ControlUnit import temp::*; ( // 1'b0 = OFF 1'b1 = ON
    /* verilator lint_off UNUSEDSIGNAL */
    input logic [31:0]            instruction,
    /* verilator lint_on UNUSEDSIGNAL */
