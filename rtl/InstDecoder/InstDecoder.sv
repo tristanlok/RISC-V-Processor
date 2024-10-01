@@ -38,13 +38,16 @@ always_comb begin
    
    /* verilator lint_off CASEINCOMPLETE */
    // switch type based on opcode
-   case(opcode)
+   unique case(opcode)
    
       7'b0000011: begin //I-TYPE
          rd = inst_in[11:7];
          funct3 = inst_in[14:12];
          rs1 = inst_in[19:15];
          imm = inst_in[31:20];
+			
+			rs2 = 5'bx; // Dont Care
+			funct7 = 7'bx; // Dont Care
       end
       
       7'b0100011: begin //S-TYPE
@@ -53,6 +56,9 @@ always_comb begin
          rs1 = inst_in[19:15];
          rs2 = inst_in[24:20];
          imm[11:5] = inst_in[31:25];
+			
+			rd = 5'bx; // Dont Care
+			funct7 = 7'bx; // Dont Care
       end
       
       7'b0110011: begin //R-TYPE
@@ -61,6 +67,8 @@ always_comb begin
          rs1 = inst_in[19:15];
          rs2 = inst_in[24:20];
          funct7 = inst_in[31:25];
+			
+			imm = 12'bx; // DOnt Care
       end
       
       7'b1100011: begin //B-TYPE //NOTE: imm for B-type is technically 13-bits because its left shift 
@@ -72,7 +80,19 @@ always_comb begin
          rs2 = inst_in[24:20];
          imm[9:4] = inst_in[30:25];
          imm[11] = inst_in[31];
+			
+			rd = 5'bx; // Dont Care
+			funct7 = 7'bx; // Dont Care
       end
+		
+		default : begin //Default - set everything to dont care
+			rs1 = 5'bx;
+			rs2 = 5'bx;
+			rd = 5'bx;
+			imm = 12'bx;
+			funct3 = 3'bx;
+			funct7 = 7'bx;
+		end
       
    endcase
 
