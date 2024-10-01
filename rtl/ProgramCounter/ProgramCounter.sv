@@ -1,4 +1,4 @@
-module program_counter (
+module ProgramCounter (
    input logic    [63:0] instruction_i,
    input logic           clock,
    
