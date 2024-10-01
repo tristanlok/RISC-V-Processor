@@ -15,6 +15,7 @@ Note: currently only supports necesary instruction types (I, S, R, B)
 
 module InstDecoder(
    input logic [31:0] inst_in,
+   output logic [6:0] opcode,
    output logic [4:0] rs1,
    output logic [4:0] rs2,
    output logic [4:0] rd,
@@ -22,9 +23,6 @@ module InstDecoder(
    output logic [2:0] funct3,
    output logic [6:0] funct7
 );
-
-// intermediates
-logic [6:0] opcode;
 
 // extract opcode from instruction
 always_comb begin
@@ -38,7 +36,7 @@ always_comb begin
    
    /* verilator lint_off CASEINCOMPLETE */
    // switch type based on opcode
-   unique case(opcode)
+   unique case(inst_in[6:0])
    
       7'b0000011: begin //I-TYPE
          rd = inst_in[11:7];
