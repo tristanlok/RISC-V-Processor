@@ -14,7 +14,7 @@ module reg_file #(
    output [REG_DATA_WIDTH-1:0]      reg_data1_out, reg_data2_out     // data output of the two specified registers
 );
 
-reg [REG_DATA_WIDTH-1:0] registers [REG_MEM_DEPTH-1:0]; // = '{default: '0};     // 32 64-bit general registers (casting not supported by symbiyosys
+reg [REG_DATA_WIDTH-1:0] registers [0:REG_MEM_DEPTH-1]; // = '{default: '0};     // 32 64-bit general registers (casting not supported by symbiyosys
 
 // Initialize the registers to 0 using an initial block
 initial begin
