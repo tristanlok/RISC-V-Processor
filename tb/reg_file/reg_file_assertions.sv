@@ -12,7 +12,7 @@ module reg_file_assertions #(
    input logic                            clk_in,
    input logic                            write_en,
    
-   output logic [REG_DATA_WIDTH-1:0]       reg_data1_out, reg_data2_out,
+   output logic [REG_DATA_WIDTH-1:0]       reg_data1_out, reg_data2_out
 );
 
    // Declare signals to drive the DUT
@@ -33,23 +33,26 @@ module reg_file_assertions #(
       .reg_data2_out(reg_data2_out)
    );
 	
-	logic [REG_MEM_DEPTH_POW-1:0]    rd_in_d;
-   logic [REG_DATA_WIDTH-1:0]       data_write_d;
+	logic [REG_MEM_DEPTH_POW-1:0] 	rs1_in_d; // previous rs1 register
+	logic [REG_MEM_DEPTH_POW-1:0] 	rs2_in_d; // previous rs2 register
+	logic [REG_MEM_DEPTH_POW-1:0]    rd_in_d; // prevous destination register
+   logic [REG_DATA_WIDTH-1:0]       data_write_d; // previous data to write
+	logic [REG_DATA_WIDTH-1:0]			data_readrd_d; // data read from the previous write destination
+	logic [REG_DATA_WIDTH-1:0]			data_read1_d; // previous data read from rs1
+	logic [REG_DATA_WIDTH-1:0] 		data_read2_d; // previous data read from rs2
+	
    logic 		                    bit_written;
    
    initial begin
 		
-		//rd_in = 5'b10000;
-		/*
-		data_write = {REG_DATA_WIDTH{1'b1}};
-		rd_in_d = {REG_MEM_DEPTH_POW{1'b0}};
-		data_write_d = {REG_DATA_WIDTH{1'b0}};
-		write_en = 1'b1;
-		*/
 		bit_written  = 1'b0;
 		rd_in_d      = {REG_MEM_DEPTH_POW{1'b0}};       // Initialize to zero
+		rs1_in_d      = {REG_MEM_DEPTH_POW{1'b0}};       // Initialize to zero
+		rs2_in_d      = {REG_MEM_DEPTH_POW{1'b0}};       // Initialize to zero
 		data_write_d = {REG_DATA_WIDTH{1'b0}};          // Initialize to zero
-
+		data_read1_d = {REG_DATA_WIDTH{1'b0}};
+		data_read2_d = {REG_DATA_WIDTH{1'b0}};
+		
    end
 	
 	always_ff @(posedge clk_in) begin
@@ -58,46 +61,50 @@ module reg_file_assertions #(
 		assume((rd_in > 0) && (rd_in < REG_MEM_DEPTH));  // Constrain write index
 		
 		assume(write_en == 1'b0 || write_en == 1'b1);  // Ensure write enable is binary
-		//assume(data_write < {REG_DATA_WIDTH{1'b1}});  // Randomize or assign reasonable values
 	end
 
-   // Read after Write Verification
-      
-   // Hold all the temporary registers (delayed)
-   
-
-   
+   // Saving delayed values
    always_ff @(posedge clk_in) begin
-      if (write_en && (rd_in != 	0)) begin
-         rd_in_d <= rd_in;
-         data_write_d <= data_write;
+	   rd_in_d <= rd_in; // delayed rd_in value
+		rs1_in_d <= rs1_in; // delayed rs1_in value
+		rs2_in_d <= rs2_in; //delayed rs2_in value
+		data_read1_d <= reg_data1_out; // delayed rs1 out
+		data_read2_d <= reg_data2_out; // delayed rs2 out
+		
+      if (write_en) begin
+         data_write_d <= data_write; // delayed written value
          bit_written <= 1'b1;
 		end else begin
 			bit_written <= 1'b0;
 		end
    end
    
-   always_ff @(posedge clk_in) begin
-      if (bit_written && (rd_in_d == rs1_in)) begin
-         assert(reg_data1_out == data_write_d);
-      end
+	// Note: flatten conditions to avoid state explosion
+	
+	// read after write integrity check
+  always_ff @(posedge clk_in) begin
+		if (bit_written && (rd_in_d == rs1_in)) begin
+			assert(reg_data1_out == data_write_d);
+		end 
+		if (bit_written && (rd_in_d == rs2_in)) begin
+			assert(reg_data2_out == data_write_d);
+		end
    end
 
-   /*
-   // No Write without Enable
+   // check write_en low means rd register stays same after
+	always_ff @(posedge clk_in) begin
+		 if (!bit_written && (rs1_in_d == rd_in_d) && (rs1_in == rs1_in_d)) begin
+			  assert(data_read1_d == reg_data1_out);
+		 end
+		 if (!bit_written && (rs2_in_d == rd_in_d) && (rs2_in == rs2_in_d)) begin
+			  assert(data_read2_d == reg_data2_out);
+		 end
+	end
+
+	
+	// register read correctness check
+	
+	// register zero behaviour
+	
    
-   logic [REG_DATA_WIDTH-1:0]       prev_data = {REG_DATA_WIDTH{1'b0}};
-   logic [REG_MEM_DEPTH_POW-1:0]    prev_rd_in = {REG_MEM_DEPTH_POW{1'b0}};
-   
-   always_ff @(posedge clk_in) begin
-      prev_data <= registers[rd_in];
-      prev_rd_in <= rd_in;
-   end
-   
-   always_ff @(posedge clk_in) begin
-      if (!write_en) begin
-         assert(prev_data == registers[prev_rd_in]);
-      end
-   end
-   */
 endmodule
