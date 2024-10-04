@@ -24,7 +24,7 @@ initial begin
 end
 
 // Combinational Logic for decoding register number into register data
-
+// Note: asynchronous read will cause timing hazards -> review use of async, consider sync
 assign reg_data1_out = registers[rs1_in];
 assign reg_data2_out = registers[rs2_in];
 
