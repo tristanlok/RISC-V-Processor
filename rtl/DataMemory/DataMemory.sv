@@ -39,10 +39,17 @@ module DataMemory #(
 );
 
 // intialize ram block
-logic [WORD_BYTES-1:0][7:0] ram[0:DEPTH-1]; //[number of bytes in a word][number of bits in a byte] ram [number of words (starting at index 0)]
+logic [WORD_BYTES-1:0][7:0] ram [0:DEPTH-1]; //[number of bytes in a word][number of bits in a byte] ram [number of words (starting at index 0)]
 
 // internal signals
 logic [DEPTH_2POW-1:0] wordNumber; // which word line to access (taken by dividing memory address by the number of bytes in a word
+
+// initialize all memory location sto 0
+initial begin
+   for (int i = 0; i < DEPTH; i = i + 1) begin
+      ram[i] = {WORD_WIDTH{1'b0}};  // Initialize each register to all 0's
+   end
+end
 
 // calculate word line number from the memory address
 always_comb begin
@@ -55,10 +62,12 @@ end
 // asynchronous reading
 always_comb begin
 
-   /* verilator lint_off UNUSEDPARAM */ // to do: reevaluate necessity of readEnable
+   /* verilator lint_off UNUSEDPARAM */ // to do: reevaluate necessity of readEnable | expecing readEnable = 1
    if(readEnable_in) begin
       data_out = ram[wordNumber]; // reads the entire word (word addressable) -> shold be byte addressable in the future
-   end
+   end else begin
+		data_out = {WORD_WIDTH{1'b0}}; // output 0s if readEnable is not on
+	end
    
 end
 
