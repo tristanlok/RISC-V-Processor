@@ -1,0 +1,16 @@
+[options]
+mode prove
+depth 20
+expect pass
+
+[engines]
+smtbmc yices
+
+[script]
+read -sv DataMemory.sv
+read -sv DataMemory_assertions.sv
+prep -top DataMemory_assertions
+
+[files]
+../../rtl/DataMemory/DataMemory.sv
+DataMemory_assertions.sv
