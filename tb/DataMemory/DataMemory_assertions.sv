@@ -67,12 +67,10 @@ module DataMemory_assertions #(
 	always_ff @(posedge clk_in) begin
 		
 		address_in_delay <= address_in;
-		data_in_delay <= data_in;
-		
 		data_out_delay <= data_out;
 		
 		if (writeEnable_in) begin
-			data_out_delay <= data_out;
+			data_in_delay <= data_in;
 			was_written <= 1'b1;
 		end else begin
 			was_written <= 1'b0;
