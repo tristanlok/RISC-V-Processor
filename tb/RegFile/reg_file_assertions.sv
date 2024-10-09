@@ -79,33 +79,42 @@ module reg_file_assertions #(
    // Note: flatten conditions to avoid state explosioncle
    
    // read after write integrity check
-  always_ff @(posedge clk_in) begin
+   always_ff @(posedge clk_in) begin
       if (bit_written && (rd_in_d == rs1_in)) begin // bit was written and read reg is same as written reg
          assert(reg_data1_out == data_write_d);
-      end 
-      if (bit_written && (rd_in_d == rs2_in)) begin // bit was written and read reg is same as written reg
-         assert(reg_data2_out == data_write_d);
       end
    end
+	
+	always_ff @(posedge clk_in) begin
+		if (bit_written && (rd_in_d == rs2_in)) begin // bit was written and read reg is same as written reg
+         assert(reg_data2_out == data_write_d);
+      end
+	end
 
    // check write_en low means rd register stays same after
    always_ff @(posedge clk_in) begin
        if (!bit_written && (rs1_in_d == rd_in_d) && (rs1_in == rs1_in_d)) begin // no write and read reg is same as was not written reg
            assert(data_read1_d == reg_data1_out);
        end
+   end
+	
+	always_ff @(posedge clk_in) begin
        if (!bit_written && (rs2_in_d == rd_in_d) && (rs2_in == rs2_in_d)) begin // no write and read reg is same was was not written reg
            assert(data_read2_d == reg_data2_out);
        end
-   end
+	end
    
    // register zero behaviour
    always_ff @(posedge clk_in) begin
       if (rs1_in == 0) begin // read reg is 0
          assert (reg_data1_out == 0);
       end
+   end
+	
+	always_ff @(posedge clk_in) begin
       if (rs2_in == 0) begin // read reg is 0
          assert (reg_data2_out == 0);
       end
-   end
-   
+	end
+	
 endmodule
