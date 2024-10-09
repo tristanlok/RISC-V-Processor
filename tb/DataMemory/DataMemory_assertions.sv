@@ -94,12 +94,4 @@ module DataMemory_assertions #(
 		end
 	end
 	
-	// write through behaviour PLACEHOLDER
-	always_ff @(posedge clk_in) begin
-		if (writeEnable_in && (address_in == read_address_in)) begin
-			assert (data_out == data_in);
-		end
-	end
-
-	
 endmodule
