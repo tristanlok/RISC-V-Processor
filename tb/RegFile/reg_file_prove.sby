@@ -12,5 +12,5 @@ read -sv reg_file_assertions.sv
 prep -top reg_file_assertions
 
 [files]
-../../rtl/reg_file.sv
+../../rtl/RegFile/reg_file.sv
 reg_file_assertions.sv

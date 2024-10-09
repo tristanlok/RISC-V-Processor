@@ -10,38 +10,25 @@ module reg_file #(
    input logic [REG_DATA_WIDTH-1:0]       data_write,                      // data to be written into register
    input logic                            clk_in,
    input logic                            write_en,
+// input logic                            reset,
 
    output logic [REG_DATA_WIDTH-1:0]      reg_data1_out, reg_data2_out    // data output of the two specified registers
 );
 
-reg [REG_DATA_WIDTH-1:0] registers [0:REG_MEM_DEPTH-1]; // = '{default: '0};     // 32 64-bit general registers (casting not supported by symbiyosys
+reg [REG_DATA_WIDTH-1:0] registers [0:REG_MEM_DEPTH-1]; //= '{default: '0};     // 32 64-bit general registers (casting not supported by symbiyosys
 
 // Initialize the registers to 0 using an initial block
+
 initial begin
    for (int i = 0; i < REG_MEM_DEPTH; i = i + 1) begin
-      registers[i] = {REG_DATA_WIDTH{1'b0}};  // Initialize each register to all 0's
+      registers[i] = '0; // Initialize each register to all 0's
    end
 end
 
 // Combinational Logic for decoding register number into register data
-// Note: asynchronous read will cause timing hazards -> review use of async, consider sync
 
-always_comb begin
-	if (rs1_in == 0) begin
-		reg_data1_out = {REG_DATA_WIDTH{1'b0}};
-	end else begin
-		reg_data1_out = registers[rs1_in];
-	end
-	
-	if (rs2_in == 0) begin
-		reg_data2_out = {REG_DATA_WIDTH{1'b0}};
-	end else begin
-		reg_data2_out = registers[rs2_in];
-	end
-
-//assign reg_data1_out = registers[rs1_in];
-//assign reg_data2_out = registers[rs2_in];
-end
+assign reg_data1_out = registers[rs1_in];
+assign reg_data2_out = registers[rs2_in];
 
 // Sequential Logic for writing data into the target register
 
@@ -49,6 +36,10 @@ always_ff @(posedge clk_in) begin
    if (write_en && (rd_in != 0)) begin
       registers[rd_in] <= data_write;
    end
+end
+
+always_ff @(posedge clk_in) begin
+   assume(registers[0] == '0);
 end
 
 endmodule
