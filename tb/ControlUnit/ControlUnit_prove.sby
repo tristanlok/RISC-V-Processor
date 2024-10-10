@@ -1,0 +1,17 @@
+[options]
+mode prove
+depth 1
+expect pass
+
+[engines]
+smtbmc yices
+smtbmc boolector
+
+[script]
+read -formal ControlUnit.sv
+read -formal ControlUnit_assertions.sv
+prep -top ControlUnit_assertions
+
+[files]
+../../rtl/ControlUnit/ControlUnit.sv
+ControlUnit_assertions.sv

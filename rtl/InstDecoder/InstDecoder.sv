@@ -86,5 +86,5 @@ module InstDecoder(
       endcase
 
    end
-      
+  
 endmodule
