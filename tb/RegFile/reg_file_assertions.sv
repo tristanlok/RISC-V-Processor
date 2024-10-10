@@ -13,7 +13,7 @@ module reg_file_assertions #(
    input logic                            write_en,
    input logic                            reset,
    
-   output logic [REG_DATA_WIDTH-1:0]       reg_data1_out, reg_data2_out
+   output logic [REG_DATA_WIDTH-1:0]      reg_data1_out, reg_data2_out
 );
 
 
