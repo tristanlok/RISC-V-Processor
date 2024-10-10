@@ -30,61 +30,61 @@ module ALU (
    output   logic             zeroFlag_out
 );
 
-logic          subEnable;
-logic [63:0]   operand2Modified; // inverted version of operand2_in if subtraction is enabled for 2's complement
-logic [63:0]   orResult;
-logic [63:0]   andResult;
-logic [63:0]   adderResult;
+   logic          subEnable;
+   logic [63:0]   operand2Modified; // inverted version of operand2_in if subtraction is enabled for 2's complement
+   logic [63:0]   orResult;
+   logic [63:0]   andResult;
+   logic [63:0]   adderResult;
 
-// subEnable and create operand2Modified
-always_comb begin
+   // subEnable and create operand2Modified
+   always_comb begin
 
-   subEnable = ~&aluOpcode_in;
-   
-   operand2Modified = operand2_in ^ {64{subEnable}}; // {64{subEnable}} replicates subEnable 64 times to become
-
-end
-
-// Full Adder/Subtractor (terminate carry_out)
-/* verilator lint_off PINCONNECTEMPTY */
-FullAdder64b FA (.operand1_in(operand1_in), .operand2_in(operand2Modified), 
-                 .carry_in(subEnable), .result_out(adderResult), .carry_out());
-
-// bitwise OR
-always_comb begin
-
-   orResult = operand1_in | operand2_in;
-
-end
-
-// bitwise AND
-always_comb begin
-
-   andResult = operand1_in & operand2_in;
-
-end
-
-// Multiplexer to choose result
-always_comb begin
-   case(aluOpcode_in)
-
-      OP_SUB:  result_out = adderResult; //SUB
-      OP_AND:  result_out = andResult; //AND
-      OP_OR:   result_out = orResult; //OR
-      OP_ADD:  result_out = adderResult; //ADD
+      subEnable = ~&aluOpcode_in;
       
-      //default case right now (full adder)
-      default: result_out = adderResult;
-      
-   endcase
-end
+      operand2Modified = operand2_in ^ {64{subEnable}}; // {64{subEnable}} replicates subEnable 64 times to become
 
-// zero flag
-always_comb begin
+   end
 
-   zeroFlag_out = ~|result_out;
+   // Full Adder/Subtractor (terminate carry_out)
+   /* verilator lint_off PINCONNECTEMPTY */
+   FullAdder64b FA (.operand1_in(operand1_in), .operand2_in(operand2Modified), 
+                    .carry_in(subEnable), .result_out(adderResult), .carry_out());
 
-end
+   // bitwise OR
+   always_comb begin
+
+      orResult = operand1_in | operand2_in;
+
+   end
+
+   // bitwise AND
+   always_comb begin
+
+      andResult = operand1_in & operand2_in;
+
+   end
+
+   // Multiplexer to choose result
+   always_comb begin
+      case(aluOpcode_in)
+
+         OP_SUB:  result_out = adderResult; //SUB
+         OP_AND:  result_out = andResult; //AND
+         OP_OR:   result_out = orResult; //OR
+         OP_ADD:  result_out = adderResult; //ADD
+         
+         //default case right now (full adder)
+         default: result_out = adderResult;
+         
+      endcase
+   end
+
+   // zero flag
+   always_comb begin
+
+      zeroFlag_out = ~|result_out;
+
+   end
 
 endmodule
 
