@@ -17,7 +17,7 @@ package control_signals;
    // Enum to control the source of data for the register (Data from memory or ALU)
    typedef enum logic {
       REG_SRC_MEM,  // Register data source: Data from memory
-		REG_SRC_ALU   // Register data source: Data from ALU
+      REG_SRC_ALU   // Register data source: Data from ALU
    } Reg_Data_Src_t;
 
 endpackage
