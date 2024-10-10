@@ -1,7 +1,7 @@
 package control_signals;
 
    // Enum to represent ALU operations (Add, Subtract, AND, OR)
-   typedef enum logic [3:0] {
+   typedef enum logic [2:0] {
       OP_ADD = 3'b111,  // ALU operation: Add
       OP_SUB = 3'b000,  // ALU operation: Subtract
       OP_AND = 3'b001,  // ALU operation: AND
