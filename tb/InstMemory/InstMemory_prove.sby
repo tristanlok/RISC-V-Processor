@@ -5,6 +5,7 @@ expect pass
 
 [engines]
 smtbmc yices
+smtbmc boolector
 
 [script]
 read -sv InstMemory.sv
