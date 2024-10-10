@@ -11,11 +11,11 @@ Ripple carry adder of two 32-bit values using 16-bit full adders
 */
 
 module FullAdder32b(
-	input logic [31:0] operand1_in,
-	input logic [31:0] operand2_in,
-	input logic carry_in,
-	output logic [31:0] result_out,
-	output logic carry_out
+   input logic [31:0] operand1_in,
+   input logic [31:0] operand2_in,
+   input logic carry_in,
+   output logic [31:0] result_out,
+   output logic carry_out
 );
 
 logic carry1; // intermediate carry 

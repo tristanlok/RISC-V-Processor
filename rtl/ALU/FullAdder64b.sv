@@ -11,11 +11,11 @@ Ripple carry adder of two 64-bit values using 32-bit full adders
 */
 
 module FullAdder64b(
-	input logic [63:0] operand1_in,
-	input logic [63:0] operand2_in,
-	input logic carry_in,
-	output logic [63:0] result_out,
-	output logic carry_out
+   input logic [63:0] operand1_in,
+   input logic [63:0] operand2_in,
+   input logic carry_in,
+   output logic [63:0] result_out,
+   output logic carry_out
 );
 
 logic carry1; // intermediate carry 

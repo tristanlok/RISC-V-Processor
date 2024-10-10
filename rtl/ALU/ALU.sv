@@ -12,26 +12,36 @@ Internal Functions:
 3. Multiplexer to choose output (add, subtract, OR, AND) based on opcode
 */
 
-module ALU(
-	input logic [63:0] operand1_in,
-	input logic [63:0] operand2_in,
-	input logic [2:0] aluOpcode_in, //check this width later
-	output logic [63:0] result_out,
-	output logic zeroFlag_out
+// FOR FORMAL VERIFICATION ONLY -> UNCOMMENT FOR PRODUCTION
+typedef enum logic [2:0] {
+   OP_ADD = 3'b111,  // ALU operation: Add
+   OP_SUB = 3'b000,  // ALU operation: Subtract
+   OP_AND = 3'b001,  // ALU operation: AND
+   OP_OR  = 3'b011   // ALU operation: OR
+} Alu_Operation_t;
+
+//module ALU import control_signals::Alu_Operation_t(
+module ALU (
+   input    logic [63:0]      operand1_in,
+   input    logic [63:0]      operand2_in,
+   input    Alu_Operation_t   aluOpcode_in,
+   
+   output   logic [63:0]      result_out,
+   output   logic             zeroFlag_out
 );
 
-logic subEnable;
-logic [63:0] operand2Modified; // inverted version of operand2_in if subtraction is enabled for 2's complement
-logic [63:0] orResult;
-logic [63:0] andResult;
-logic [63:0] adderResult;
+logic          subEnable;
+logic [63:0]   operand2Modified; // inverted version of operand2_in if subtraction is enabled for 2's complement
+logic [63:0]   orResult;
+logic [63:0]   andResult;
+logic [63:0]   adderResult;
 
 // subEnable and create operand2Modified
 always_comb begin
 
-	subEnable = ~&aluOpcode_in;
-	
-	operand2Modified = operand2_in ^ {64{subEnable}}; // {64{subEnable}} replicates subEnable 64 times to become
+   subEnable = ~&aluOpcode_in;
+   
+   operand2Modified = operand2_in ^ {64{subEnable}}; // {64{subEnable}} replicates subEnable 64 times to become
 
 end
 
@@ -43,36 +53,36 @@ FullAdder64b FA (.operand1_in(operand1_in), .operand2_in(operand2Modified),
 // bitwise OR
 always_comb begin
 
-	orResult = operand1_in | operand2_in;
+   orResult = operand1_in | operand2_in;
 
 end
 
 // bitwise AND
 always_comb begin
 
-	andResult = operand1_in & operand2_in;
+   andResult = operand1_in & operand2_in;
 
 end
 
 // Multiplexer to choose result
 always_comb begin
-	case(aluOpcode_in)
+   case(aluOpcode_in)
 
-		3'b000: result_out = adderResult; //SUB
-		3'b001: result_out = andResult; //AND
-		3'b011: result_out = orResult; //OR
-		3'b111: result_out = adderResult; //ADD
-		
-		//default case right now (full adder)
-		default: result_out = adderResult;
-		
-	endcase
+      OP_SUB:  result_out = adderResult; //SUB
+      OP_AND:  result_out = andResult; //AND
+      OP_OR:   result_out = orResult; //OR
+      OP_ADD:  result_out = adderResult; //ADD
+      
+      //default case right now (full adder)
+      default: result_out = adderResult;
+      
+   endcase
 end
 
 // zero flag
 always_comb begin
 
-	zeroFlag_out = ~|result_out;
+   zeroFlag_out = ~|result_out;
 
 end
 
