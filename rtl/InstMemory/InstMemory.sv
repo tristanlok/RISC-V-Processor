@@ -9,9 +9,9 @@ module InstMemory #(
    localparam  MEM_DEPTH = 1 << MEM_DEPTH_POW      // Number of instructions stored in instruction memory   
 ) 
 (
-   input		logic [ADDR_WIDTH-1:0] address_in,
+   input    logic [ADDR_WIDTH-1:0]           address_in,
    
-   output   logic [DATA_WIDTH-1:0] data_out
+   output   logic [DATA_WIDTH-1:0]           data_out
 );
 
 // Create the instruction memory
@@ -29,9 +29,7 @@ always_comb begin
    wordNumber = address_in >> WORD_SIZE_POW;
 end
 
-// read instruction  
-always_comb begin
-   data_out = ram[wordNumber];
-end
+// Assigns the Instruction Data Out
+assign data_out = ram[wordNumber];
    
 endmodule
