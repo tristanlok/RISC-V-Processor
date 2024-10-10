@@ -1,17 +1,17 @@
 module ProgramCounter (
-   input logic    [63:0] instruction_i,
-   input logic           clock,
-   input logic           reset,
+   input    logic [63:0]   instruction_i,       // Next Instruction is recieved
+   input    logic          clk_in,
+   input    logic          reset,
    
-   output logic   [63:0] instruction_o
+   output   logic [63:0]   instruction_o        // Current Instruction is released
 );
 
-always_ff @(posedge clock) begin
-   if (reset) begin
-      instruction_o <= '0;
-   end else begin
-      instruction_o <= instruction_i;
+   always_ff @(posedge clk_in) begin
+      if (reset) begin                          // Resets back to the first Instruction
+         instruction_o <= '0;
+      end else begin
+         instruction_o <= instruction_i;        // Switches to next Instruction
+      end
    end
-end
 
 endmodule

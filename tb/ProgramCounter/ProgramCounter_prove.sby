@@ -1,9 +1,11 @@
 [options]
 mode prove
 depth 100
+expect pass
 
 [engines]
 smtbmc yices
+smtbmc boolector
 
 [script]
 read -formal ProgramCounter.sv
