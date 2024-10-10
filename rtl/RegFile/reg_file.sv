@@ -33,14 +33,14 @@ assign reg_data2_out = registers[rs2_in];
 // Sequential Logic for writing data into the target register
 
 always_ff @(posedge clk_in) begin
-	if (reset) begin
-		// registers <= '{default: '0};
-		
-		for (int i = 0; i < REG_MEM_DEPTH; i = i + 1) begin
-			registers[i] <= '0; // Initialize each register to all 0's
-		end
-	
-	end else if (write_en && (rd_in != 0)) begin
+   if (reset) begin
+      // registers <= '{default: '0};
+      
+      for (int i = 0; i < REG_MEM_DEPTH; i = i + 1) begin
+         registers[i] <= '0; // Initialize each register to all 0's
+      end
+   
+   end else if (write_en && (rd_in != 0)) begin
       registers[rd_in] <= data_write;
    end
 end
