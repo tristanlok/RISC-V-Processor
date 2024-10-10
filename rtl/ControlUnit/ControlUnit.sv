@@ -1,4 +1,23 @@
-module ControlUnit import control_signals::*; ( // 1'b0 = OFF 1'b1 = ON
+// FOR FORMAL VERIFICATION ONLY -> UNCOMMENT FOR PRODUCTION
+typedef enum logic [2:0] {
+	OP_ADD = 3'b111,  
+	OP_SUB = 3'b000,  
+	OP_AND = 3'b001,
+	OP_OR  = 3'b011 
+} Alu_Operation_t;
+
+typedef enum logic {
+	ALU_SRC_REG, 
+	ALU_SRC_IMM  
+} Alu_Src_t;
+
+typedef enum logic {
+	REG_SRC_MEM,  
+	REG_SRC_ALU   
+} Reg_Data_Src_t;
+
+//module ControlUnit import control_signals::*; ( // 1'b0 = OFF 1'b1 = ON //COMMENT WHEN DOING FORMAL VERIFICATION
+module ControlUnit( // 1'b0 = OFF 1'b1 = ON // UNCOMMENT WHEN DOING FORMAL VERIFICATION
    input logic [6:0]          opcode_in,
 	input logic [2:0]          funct3_in,
 	input logic [6:0]          funct7_in,
