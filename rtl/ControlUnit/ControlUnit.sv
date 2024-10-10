@@ -1,13 +1,13 @@
-module ControlUnit import temp::*; ( // 1'b0 = OFF 1'b1 = ON
-   input logic [6:0] opcode_in,
-	input logic [2:0] funct3_in,
-	input logic [6:0] funct7_in,
-   output reg_alu_ctrl_t      reg_alu_mux,
+module ControlUnit import control_signals::*; ( // 1'b0 = OFF 1'b1 = ON
+   input logic [6:0]          opcode_in,
+	input logic [2:0]          funct3_in,
+	input logic [6:0]          funct7_in,
+   output Alu_Src_t           alu_src_mux,
    output logic               mem_read,
    output logic               mem_write,
    output Alu_Operation_t     alu_op,
    output logic               reg_write,
-   output data_reg_ctrl_t     data_reg_mux,
+   output Reg_Data_Src_t      data_ALU_SRC_REG,
    output logic               branch_ctrl
 );
 
@@ -15,23 +15,23 @@ always_comb begin
    case(opcode_in)
       7'b0000011: begin //I-TYPE
          // Currently the only instruction supported in I-TYPE is LD
-         reg_alu_mux    = IMM_MUX;
+         alu_src_mux    = ALU_SRC_IMM;
          mem_read       = 1'b1;
          mem_write      = 1'b0;
          alu_op         = OP_ADD;
          reg_write      = 1'b1;
-         data_reg_mux   = DATA_MEM_MUX;
+         data_ALU_SRC_REG   = REG_SRC_MEM;
          branch_ctrl    = 1'b0;
       end
       
       7'b0100011: begin //S-TYPE
          // Currently the only instruction supported in S_TYPE is SD
-         reg_alu_mux    = IMM_MUX;
+         alu_src_mux    = ALU_SRC_IMM;
          mem_read       = 1'b0;
          mem_write      = 1'b1;
          alu_op         = OP_ADD;
          reg_write      = 1'b0;
-         data_reg_mux   = DATA_ALU_MUX; // Doesn't Matter Which one
+         data_ALU_SRC_REG   = REG_SRC_ALU; // Doesn't Matter Which one
          branch_ctrl    = 1'b0;
       end
       
@@ -43,66 +43,66 @@ always_comb begin
                case (funct7_in)
                   7'b0000000: begin
                      // ADD Instruction
-                     reg_alu_mux    = REG_MUX;
+                     alu_src_mux    = ALU_SRC_REG;
                      mem_read       = 1'b0;
                      mem_write      = 1'b0;
                      alu_op         = OP_ADD;
                      reg_write      = 1'b1;
-                     data_reg_mux   = DATA_ALU_MUX;
+                     data_ALU_SRC_REG   = REG_SRC_ALU;
                      branch_ctrl    = 1'b0;
                   end
                   
                   7'b0100000: begin
                      // SUB Instruction
-                     reg_alu_mux    = REG_MUX;
+                     alu_src_mux    = ALU_SRC_REG;
                      mem_read       = 1'b0;
                      mem_write      = 1'b0;
                      alu_op         = OP_SUB;
                      reg_write      = 1'b1;
-                     data_reg_mux   = DATA_ALU_MUX;
+                     data_ALU_SRC_REG   = REG_SRC_ALU;
                      branch_ctrl    = 1'b0;
                   end
                   
                   default: begin
-                     reg_alu_mux    = REG_MUX;
+                     alu_src_mux    = ALU_SRC_REG;
                      mem_read       = 1'b0;
                      mem_write      = 1'b0;
                      alu_op         = OP_AND;
                      reg_write      = 1'b0;
-                     data_reg_mux   = DATA_ALU_MUX;
+                     data_ALU_SRC_REG   = REG_SRC_ALU;
                      branch_ctrl    = 1'b0;
                   end
                endcase
             end
             3'b111: begin
                // AND Instruction
-               reg_alu_mux    = REG_MUX;
+               alu_src_mux    = ALU_SRC_REG;
                mem_read       = 1'b0;
                mem_write      = 1'b0;
                alu_op         = OP_AND;
                reg_write      = 1'b1;
-               data_reg_mux   = DATA_ALU_MUX;
+               data_ALU_SRC_REG   = REG_SRC_ALU;
                branch_ctrl    = 1'b0;
             end
             
             3'b110: begin
                // OR Instruction
-               reg_alu_mux    = REG_MUX;
+               alu_src_mux    = ALU_SRC_REG;
                mem_read       = 1'b0;
                mem_write      = 1'b0;
                alu_op         = OP_OR;
                reg_write      = 1'b1;
-               data_reg_mux   = DATA_ALU_MUX;
+               data_ALU_SRC_REG   = REG_SRC_ALU;
                branch_ctrl    = 1'b0;
             end
             
             default: begin
-               reg_alu_mux    = REG_MUX;
+               alu_src_mux    = ALU_SRC_REG;
                mem_read       = 1'b0;
                mem_write      = 1'b0;
                alu_op         = OP_AND;
                reg_write      = 1'b0;
-               data_reg_mux   = DATA_ALU_MUX;
+               data_ALU_SRC_REG   = REG_SRC_ALU;
                branch_ctrl    = 1'b0;
             end
          endcase
@@ -110,22 +110,22 @@ always_comb begin
       
       7'b1100011: begin
          // BEQ Instruction
-         reg_alu_mux    = REG_MUX;
+         alu_src_mux    = ALU_SRC_REG;
          mem_read       = 1'b0;
          mem_write      = 1'b0;
          alu_op         = OP_SUB;
          reg_write      = 1'b0;
-         data_reg_mux   = DATA_ALU_MUX; // Doesn't Matter Which one
+         data_ALU_SRC_REG   = REG_SRC_ALU; // Doesn't Matter Which one
          branch_ctrl    = 1'b1;
       end
       
       default: begin
-         reg_alu_mux    = REG_MUX;
+         alu_src_mux    = ALU_SRC_REG;
          mem_read       = 1'b0;
          mem_write      = 1'b0;
          alu_op         = OP_AND;
          reg_write      = 1'b0;
-         data_reg_mux   = DATA_ALU_MUX;
+         data_ALU_SRC_REG   = REG_SRC_ALU;
          branch_ctrl    = 1'b0;
       end
    endcase
