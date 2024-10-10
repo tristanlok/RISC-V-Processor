@@ -66,3 +66,6 @@ PLLJ_PLLSPE_INFO.txt
 output_files/
 *.qsf
 *.qpf
+
+# nvim lsp
+.hdl_checker/
