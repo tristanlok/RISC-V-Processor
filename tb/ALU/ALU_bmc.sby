@@ -1,0 +1,28 @@
+[options]
+mode bmc
+depth 1
+expect pass
+
+[engines]
+smtbmc yices
+
+[script]
+read -formal ALU.sv
+read -formal ALU_assertions.sv
+read -formal FullAdder1b.sv
+read -formal FullAdder4b.sv
+read -formal FullAdder8b.sv
+read -formal FullAdder16b.sv
+read -formal FullAdder32b.sv
+read -formal FullAdder64b.sv
+prep -top ALU_assertions
+
+[files]
+../../rtl/ALU/ALU.sv
+../../rtl/ALU/FullAdder1b.sv
+../../rtl/ALU/FullAdder4b.sv
+../../rtl/ALU/FullAdder8b.sv
+../../rtl/ALU/FullAdder16b.sv
+../../rtl/ALU/FullAdder32b.sv
+../../rtl/ALU/FullAdder64b.sv
+ALU_assertions.sv
