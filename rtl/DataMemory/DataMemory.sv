@@ -35,6 +35,8 @@ module DataMemory #(
    input logic writeEnable_in, //enable write
    input logic readEnable_in, //enable read
    input logic clk_in, //clock signal
+   input logic reset, //clock signal   
+   
    output logic [DATA_WIDTH-1:0] data_out //data output (read)
 );
 
@@ -47,7 +49,7 @@ logic [DEPTH_2POW-1:0] wordNumber; // which word line to access (taken by dividi
 // initialize all memory location sto 0
 initial begin
    for (int i = 0; i < DEPTH; i = i + 1) begin
-      ram[i] = {WORD_WIDTH{1'b0}};  // Initialize each register to all 0's
+      ram[i] = '0;  // Initialize each register to all 0's
    end
 end
 
@@ -66,18 +68,25 @@ always_comb begin
    if(readEnable_in) begin
       data_out = ram[wordNumber]; // reads the entire word (word addressable) -> shold be byte addressable in the future
    end else begin
-		data_out = {WORD_WIDTH{1'b0}}; // output 0s if readEnable is not on
-	end
+      data_out = '0; // output 0s if readEnable is not on
+   end
    
 end
 
 // synchronous writing
 always_ff @(posedge clk_in) begin
+
+   if (reset) begin
+      // ram <= '{default: '0};
+      
+      for (int i = 0; i < DEPTH; i = i + 1) begin
+         ram[i] <= '0; // Initialize each register to all 0's
+      end
    
-   if(writeEnable_in) begin
+   end else if(writeEnable_in) begin
       ram[wordNumber] <= data_in; //writes the entire word to the address -> should be byte addressable in the future (see example below)
    end
-		
+      
 end
    
 endmodule 
