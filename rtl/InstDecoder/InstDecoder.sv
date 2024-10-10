@@ -45,8 +45,8 @@ module InstDecoder(
             rs1 = inst_in[19:15];
             imm = inst_in[31:20];
             
-            rs2 = 5'bx; // Dont Care
-            funct7 = 7'bx; // Dont Care
+            rs2 = '0; // Dont Care
+            funct7 = '0; // Dont Care
          end
          
          7'b0100011: begin //S-TYPE
@@ -56,8 +56,8 @@ module InstDecoder(
             rs2 = inst_in[24:20];
             imm[11:5] = inst_in[31:25];
             
-            rd = 5'bx; // Dont Care
-            funct7 = 7'bx; // Dont Care
+            rd = '0; // Dont Care
+            funct7 = '0; // Dont Care
          end
          
          7'b0110011: begin //R-TYPE
@@ -67,7 +67,7 @@ module InstDecoder(
             rs2 = inst_in[24:20];
             funct7 = inst_in[31:25];
             
-            imm = 12'bx; // DOnt Care
+            imm = '0; // Dont Care
          end
          
          7'b1100011: begin //B-TYPE //NOTE: imm for B-type is technically 13-bits because its left shift 
@@ -80,19 +80,9 @@ module InstDecoder(
             imm[9:4] = inst_in[30:25];
             imm[11] = inst_in[31];
             
-            rd = 5'bx; // Dont Care
-            funct7 = 7'bx; // Dont Care
-         end
-         
-         default : begin //Default - set everything to dont care
-            rs1 = 5'bx;
-            rs2 = 5'bx;
-            rd = 5'bx;
-            imm = 12'bx;
-            funct3 = 3'bx;
-            funct7 = 7'bx;
-         end
-         
+            rd = '0; // Dont Care
+            funct7 = '0; // Dont Care
+         end         
       endcase
 
    end
