@@ -4,7 +4,8 @@ depth 20
 expect pass
 
 [engines]
-smtbmc yices
+smtbmc yices 
+smtbmc boolector 
 
 [script]
 read -sv DataMemory.sv
