@@ -1,0 +1,50 @@
+SBY 12:01:53 [reg_file_prove] Removing directory '/home/tristanlok/Github/RISC-V-Processor/tb/RegFile/reg_file_prove'.
+SBY 12:01:53 [reg_file_prove] Copy '/home/tristanlok/Github/RISC-V-Processor/rtl/RegFile/reg_file.sv' to '/home/tristanlok/Github/RISC-V-Processor/tb/RegFile/reg_file_prove/src/reg_file.sv'.
+SBY 12:01:53 [reg_file_prove] Copy '/home/tristanlok/Github/RISC-V-Processor/tb/RegFile/reg_file_assertions.sv' to '/home/tristanlok/Github/RISC-V-Processor/tb/RegFile/reg_file_prove/src/reg_file_assertions.sv'.
+SBY 12:01:53 [reg_file_prove] engine_0: smtbmc boolector
+SBY 12:01:53 [reg_file_prove] engine_1: smtbmc yices
+SBY 12:01:53 [reg_file_prove] base: starting process "cd reg_file_prove/src; yosys -ql ../model/design.log ../model/design.ys"
+SBY 12:01:53 [reg_file_prove] base: finished (returncode=0)
+SBY 12:01:53 [reg_file_prove] prep: starting process "cd reg_file_prove/model; yosys -ql design_prep.log design_prep.ys"
+SBY 12:01:53 [reg_file_prove] prep: finished (returncode=0)
+SBY 12:01:53 [reg_file_prove] smt2: starting process "cd reg_file_prove/model; yosys -ql design_smt2.log design_smt2.ys"
+SBY 12:01:53 [reg_file_prove] smt2: finished (returncode=0)
+SBY 12:01:53 [reg_file_prove] engine_0.basecase: starting process "cd reg_file_prove; yosys-smtbmc -s boolector --presat --unroll --noprogress -t 20  --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc model/design_smt2.smt2"
+SBY 12:01:53 [reg_file_prove] engine_0.induction: starting process "cd reg_file_prove; yosys-smtbmc -s boolector --presat --unroll -i --noprogress -t 20  --append 0 --dump-vcd engine_0/trace_induct.vcd --dump-yw engine_0/trace_induct.yw --dump-vlogtb engine_0/trace_induct_tb.v --dump-smtc engine_0/trace_induct.smtc model/design_smt2.smt2"
+SBY 12:01:53 [reg_file_prove] engine_1.induction: starting process "cd reg_file_prove; yosys-smtbmc -s yices --presat --unroll -i --noprogress -t 20  --append 0 --dump-vcd engine_1/trace_induct.vcd --dump-yw engine_1/trace_induct.yw --dump-vlogtb engine_1/trace_induct_tb.v --dump-smtc engine_1/trace_induct.smtc model/design_smt2.smt2"
+SBY 12:01:53 [reg_file_prove] engine_0.induction: ##   0:00:00  Solver: boolector
+SBY 12:01:53 [reg_file_prove] engine_1.induction: ##   0:00:00  Solver: yices
+SBY 12:01:53 [reg_file_prove] engine_1.basecase: starting process "cd reg_file_prove; yosys-smtbmc -s yices --presat --unroll --noprogress -t 20  --append 0 --dump-vcd engine_1/trace.vcd --dump-yw engine_1/trace.yw --dump-vlogtb engine_1/trace_tb.v --dump-smtc engine_1/trace.smtc model/design_smt2.smt2"
+SBY 12:01:53 [reg_file_prove] engine_0.basecase: ##   0:00:00  Solver: boolector
+SBY 12:01:53 [reg_file_prove] engine_0.induction: ##   0:00:00  Trying induction in step 20..
+SBY 12:01:53 [reg_file_prove] engine_1.induction: ##   0:00:00  Trying induction in step 20..
+SBY 12:01:53 [reg_file_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 0..
+SBY 12:01:53 [reg_file_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 0..
+SBY 12:01:53 [reg_file_prove] engine_1.induction: ##   0:00:00  Trying induction in step 19..
+SBY 12:01:53 [reg_file_prove] engine_1.basecase: ##   0:00:00  Solver: yices
+SBY 12:01:53 [reg_file_prove] engine_0.induction: ##   0:00:00  Trying induction in step 19..
+SBY 12:01:53 [reg_file_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 1..
+SBY 12:01:53 [reg_file_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 1..
+SBY 12:01:53 [reg_file_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 2..
+SBY 12:01:53 [reg_file_prove] engine_1.basecase: ##   0:00:00  Checking assumptions in step 0..
+SBY 12:01:53 [reg_file_prove] engine_1.basecase: ##   0:00:00  Checking assertions in step 0..
+SBY 12:01:53 [reg_file_prove] engine_1.basecase: ##   0:00:00  Checking assumptions in step 1..
+SBY 12:01:53 [reg_file_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 2..
+SBY 12:01:53 [reg_file_prove] engine_0.induction: ##   0:00:00  Trying induction in step 18..
+SBY 12:01:53 [reg_file_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 3..
+SBY 12:01:53 [reg_file_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 3..
+SBY 12:01:53 [reg_file_prove] engine_1.induction: ##   0:00:00  Trying induction in step 18..
+SBY 12:01:54 [reg_file_prove] engine_1.basecase: ##   0:00:00  Checking assertions in step 1..
+SBY 12:01:54 [reg_file_prove] engine_1.basecase: ##   0:00:00  Checking assumptions in step 2..
+SBY 12:01:54 [reg_file_prove] engine_0.basecase: ##   0:00:01  Checking assumptions in step 4..
+SBY 12:01:55 [reg_file_prove] engine_0.induction: ##   0:00:01  Temporal induction successful.
+SBY 12:01:55 [reg_file_prove] engine_0.induction: ##   0:00:01  Status: passed
+SBY 12:01:55 [reg_file_prove] engine_0.induction: finished (returncode=0)
+SBY 12:01:55 [reg_file_prove] engine_0.induction: Status returned by engine for induction: pass
+SBY 12:01:55 [reg_file_prove] engine_1.induction: terminating process
+SBY 12:01:55 [reg_file_prove] engine_0.basecase: ##   0:00:01  Checking assertions in step 4..
+SBY 12:01:55 [reg_file_prove] engine_0.basecase: ##   0:00:02  Checking assumptions in step 5..
+SBY 12:01:56 [reg_file_prove] engine_1.basecase: ##   0:00:02  Checking assertions in step 2..
+SBY 12:01:56 [reg_file_prove] engine_0.basecase: ##   0:00:02  Checking assertions in step 5..
+SBY 12:01:58 [reg_file_prove] engine_0.basecase: terminating process
+SBY 12:01:58 [reg_file_prove] engine_1.basecase: terminating process
