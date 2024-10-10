@@ -7,7 +7,7 @@ module ControlUnit import control_signals::*; ( // 1'b0 = OFF 1'b1 = ON
    output logic               mem_write,
    output Alu_Operation_t     alu_op,
    output logic               reg_write,
-   output Reg_Data_Src_t      data_ALU_SRC_REG,
+   output Reg_Data_Src_t      reg_src_mux,
    output logic               branch_ctrl
 );
 
@@ -20,7 +20,7 @@ always_comb begin
          mem_write      = 1'b0;
          alu_op         = OP_ADD;
          reg_write      = 1'b1;
-         data_ALU_SRC_REG   = REG_SRC_MEM;
+         reg_src_mux   = REG_SRC_MEM;
          branch_ctrl    = 1'b0;
       end
       
@@ -31,7 +31,7 @@ always_comb begin
          mem_write      = 1'b1;
          alu_op         = OP_ADD;
          reg_write      = 1'b0;
-         data_ALU_SRC_REG   = REG_SRC_ALU; // Doesn't Matter Which one
+         reg_src_mux   = REG_SRC_ALU; // Doesn't Matter Which one
          branch_ctrl    = 1'b0;
       end
       
@@ -48,7 +48,7 @@ always_comb begin
                      mem_write      = 1'b0;
                      alu_op         = OP_ADD;
                      reg_write      = 1'b1;
-                     data_ALU_SRC_REG   = REG_SRC_ALU;
+                     reg_src_mux   = REG_SRC_ALU;
                      branch_ctrl    = 1'b0;
                   end
                   
@@ -59,7 +59,7 @@ always_comb begin
                      mem_write      = 1'b0;
                      alu_op         = OP_SUB;
                      reg_write      = 1'b1;
-                     data_ALU_SRC_REG   = REG_SRC_ALU;
+                     reg_src_mux   = REG_SRC_ALU;
                      branch_ctrl    = 1'b0;
                   end
                   
@@ -69,7 +69,7 @@ always_comb begin
                      mem_write      = 1'b0;
                      alu_op         = OP_AND;
                      reg_write      = 1'b0;
-                     data_ALU_SRC_REG   = REG_SRC_ALU;
+                     reg_src_mux   = REG_SRC_ALU;
                      branch_ctrl    = 1'b0;
                   end
                endcase
@@ -81,7 +81,7 @@ always_comb begin
                mem_write      = 1'b0;
                alu_op         = OP_AND;
                reg_write      = 1'b1;
-               data_ALU_SRC_REG   = REG_SRC_ALU;
+               reg_src_mux   = REG_SRC_ALU;
                branch_ctrl    = 1'b0;
             end
             
@@ -92,7 +92,7 @@ always_comb begin
                mem_write      = 1'b0;
                alu_op         = OP_OR;
                reg_write      = 1'b1;
-               data_ALU_SRC_REG   = REG_SRC_ALU;
+               reg_src_mux   = REG_SRC_ALU;
                branch_ctrl    = 1'b0;
             end
             
@@ -102,7 +102,7 @@ always_comb begin
                mem_write      = 1'b0;
                alu_op         = OP_AND;
                reg_write      = 1'b0;
-               data_ALU_SRC_REG   = REG_SRC_ALU;
+               reg_src_mux   = REG_SRC_ALU;
                branch_ctrl    = 1'b0;
             end
          endcase
@@ -115,7 +115,7 @@ always_comb begin
          mem_write      = 1'b0;
          alu_op         = OP_SUB;
          reg_write      = 1'b0;
-         data_ALU_SRC_REG   = REG_SRC_ALU; // Doesn't Matter Which one
+         reg_src_mux   = REG_SRC_ALU; // Doesn't Matter Which one
          branch_ctrl    = 1'b1;
       end
       
@@ -125,7 +125,7 @@ always_comb begin
          mem_write      = 1'b0;
          alu_op         = OP_AND;
          reg_write      = 1'b0;
-         data_ALU_SRC_REG   = REG_SRC_ALU;
+         reg_src_mux   = REG_SRC_ALU;
          branch_ctrl    = 1'b0;
       end
    endcase
