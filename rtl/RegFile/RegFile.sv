@@ -1,4 +1,4 @@
-module reg_file #(
+module RegFile #(
    parameter   REG_DATA_WIDTH_POW = 6,
    localparam  REG_DATA_WIDTH = 1 << REG_DATA_WIDTH_POW,
    

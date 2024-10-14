@@ -1,0 +1,17 @@
+[options]
+mode prove
+depth 20
+expect pass
+
+[engines]
+smtbmc boolector
+smtbmc yices
+
+[script]
+read -sv RegFile.sv
+read -sv RegFile_assertions.sv
+prep -top RegFile_assertions
+
+[files]
+../../rtl/RegFile/RegFile.sv
+RegFile_assertions.sv
