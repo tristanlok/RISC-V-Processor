@@ -11,7 +11,7 @@ module InstMemory #(
 (
    input    logic [ADDR_WIDTH-1:0]           address_in,
    
-   output   logic [DATA_WIDTH-1:0]           data_out
+   output   logic [DATA_WIDTH-1:0]           instr_out
 );
 
 	// Create the instruction memory
@@ -30,6 +30,6 @@ module InstMemory #(
 	end
 
 	// Assigns the Instruction Data Out
-	assign data_out = ram[wordNumber];
+	assign instr_out = ram[wordNumber];
    
 endmodule
