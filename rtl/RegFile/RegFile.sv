@@ -19,8 +19,8 @@ module RegFile #(
    // ONLY USED FOR FORMAL VERIFICATION TO INITIALIZE REGISTERS AS '0
    /*
    initial begin
-		// registers = '{default: '0} (casting not supported by symbiyosys)
-	
+      // registers = '{default: '0} (casting not supported by symbiyosys)
+   
       for (int i = 0; i < GEN_REG_COUNT; i = i + 1) begin
          registers[i] = '0; // Initialize each register to all 0's
       end
