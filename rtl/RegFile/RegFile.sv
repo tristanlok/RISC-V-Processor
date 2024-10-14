@@ -14,11 +14,13 @@ module RegFile #(
    output   logic [REG_DATA_WIDTH-1:0]    reg_data1_out, reg_data2_out     // data output of the two specified registers
 );
 
-   logic [REG_DATA_WIDTH-1:0] registers [0:GEN_REG_COUNT-1] = '{default: '0};     // 32 64-bit general registers 
+   logic [REG_DATA_WIDTH-1:0] registers [0:GEN_REG_COUNT-1];     // 32 64-bit general registers 
    
-   // ONLY USED FOR FORMAL VERIFICATION TO INITIALIZE REGISTERS AS '0 (casting not supported by symbiyosys)
+   // ONLY USED FOR FORMAL VERIFICATION TO INITIALIZE REGISTERS AS '0
    /*
    initial begin
+		// registers = '{default: '0} (casting not supported by symbiyosys)
+	
       for (int i = 0; i < GEN_REG_COUNT; i = i + 1) begin
          registers[i] = '0; // Initialize each register to all 0's
       end
@@ -36,7 +38,7 @@ module RegFile #(
       if (reset) begin
          registers <= '{default: '0};
          
-         // ONLY USED FOR FORMAL VERIFICATION TO INITIALIZE REGISTERS AS '0 (casting not supported by symbiyosys)
+         // ONLY USED FOR FORMAL VERIFICATION TO SET REGISTERS AS '0 (casting not supported by symbiyosys)
          /*
          for (int i = 0; i < GEN_REG_COUNT; i = i + 1) begin
             registers[i] <= '0; // Initialize each register to all 0's
