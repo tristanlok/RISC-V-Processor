@@ -1,5 +1,4 @@
-package control_signals;
-
+package ControlSignals;
    // Enum to represent ALU operations (Add, Subtract, AND, OR)
    typedef enum logic [2:0] {
       OP_ADD = 3'b111,  // ALU operation: Add
@@ -19,5 +18,4 @@ package control_signals;
       REG_SRC_MEM,  // Register data source: Data from memory
       REG_SRC_ALU   // Register data source: Data from ALU
    } Reg_Data_Src_t;
-
 endpackage
