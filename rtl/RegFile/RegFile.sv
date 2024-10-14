@@ -1,30 +1,30 @@
 module RegFile #(
-   parameter   REG_DATA_WIDTH_POW = 6,
+   parameter   REG_DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
    localparam  REG_DATA_WIDTH = 1 << REG_DATA_WIDTH_POW,
    
-   parameter   REG_MEM_DEPTH_POW = 5,
-   localparam  REG_MEM_DEPTH = 1 << REG_MEM_DEPTH_POW
+   localparam  GEN_REG_COUNT = 32                           // RISC-V only supports 32 General Purpose Registers
 )(
-   input logic [REG_MEM_DEPTH_POW-1:0]    rs1_in, rs2_in,                  // register numbers to read data from
-   input logic [REG_MEM_DEPTH_POW-1:0]    rd_in,                           // register number to write data to
-   input logic [REG_DATA_WIDTH-1:0]       data_write,                      // data to be written into register
-   input logic                            clk_in,
-   input logic                            write_en,
-   input logic                            reset,
+   input    logic                         clk_in,
+   input    logic                         reset,
+   input    logic                         write_en,
+   input    logic [4:0]                   rs1_in, rs2_in,                  // register numbers to read data from
+   input    logic [4:0]                   rd_in,                           // register number to write data to
+   input    logic [REG_DATA_WIDTH-1:0]    write_data_in,                   // data to be written into target register
 
-   output logic [REG_DATA_WIDTH-1:0]      reg_data1_out, reg_data2_out    // data output of the two specified registers
+   output   logic [REG_DATA_WIDTH-1:0]    reg_data1_out, reg_data2_out     // data output of the two specified registers
 );
 
-   logic [REG_DATA_WIDTH-1:0] registers [0:REG_MEM_DEPTH-1]; //= '{default: '0};     // 32 64-bit general registers (casting not supported by symbiyosys
-
-   // Initialize the registers to 0 using an initial block
-
+   logic [REG_DATA_WIDTH-1:0] registers [0:GEN_REG_COUNT-1] = '{default: '0};     // 32 64-bit general registers 
+   
+   // ONLY USED FOR FORMAL VERIFICATION TO INITIALIZE REGISTERS AS '0 (casting not supported by symbiyosys)
+   /*
    initial begin
-      for (int i = 0; i < REG_MEM_DEPTH; i = i + 1) begin
+      for (int i = 0; i < GEN_REG_COUNT; i = i + 1) begin
          registers[i] = '0; // Initialize each register to all 0's
       end
    end
-
+   */
+   
    // Combinational Logic for decoding register number into register data
 
    assign reg_data1_out = registers[rs1_in];
@@ -34,23 +34,24 @@ module RegFile #(
 
    always_ff @(posedge clk_in) begin
       if (reset) begin
-         // registers <= '{default: '0};
+         registers <= '{default: '0};
          
-         for (int i = 0; i < REG_MEM_DEPTH; i = i + 1) begin
+         // ONLY USED FOR FORMAL VERIFICATION TO INITIALIZE REGISTERS AS '0 (casting not supported by symbiyosys)
+         /*
+         for (int i = 0; i < GEN_REG_COUNT; i = i + 1) begin
             registers[i] <= '0; // Initialize each register to all 0's
          end
+         */
       
       end else if (write_en && (rd_in != 0)) begin
-         registers[rd_in] <= data_write;
+         registers[rd_in] <= write_data_in;
       end
    end
 
-   // ONLY USED FOR FORMAL VERIFICATION
-
+   // ONLY USED FOR FORMAL VERIFICATION, DEEP HIERARCHY REFERENCE NOT SUPPORTED BY SYMBIYOSYS
+   /*
    always_ff @(posedge clk_in) begin
       assume(registers[0] == '0);
    end
-
-   // #################################
-
+   */
 endmodule
