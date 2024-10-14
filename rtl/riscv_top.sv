@@ -1,62 +1,62 @@
  module riscv_top import ControlSignals::*; #(
-	// Parameters to configure Register Size (32-bit, 64-bit, 128-bit, etc.)
-	parameter   REG_DATA_WIDTH_POW = 6,								// Using Powers as Parameter ensures width is a power of 2
+   // Parameters to configure Register Size (32-bit, 64-bit, 128-bit, etc.)
+   parameter   REG_DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
    localparam  REG_DATA_WIDTH = 1 << REG_DATA_WIDTH_POW,
  )(
     input   logic       clk_in
-	 // add reset and maybe change reset pin names
-	 
-	 // ALL I/O CHANGES MUST BE REFLECTED IN FV FILES TOO
-	 
-	 // INSTR ALSO CHANGES ALL NAMES
+    // add reset and maybe change reset pin names
+    
+    // ALL I/O CHANGES MUST BE REFLECTED IN FV FILES TOO
+    
+    // INSTR ALSO CHANGES ALL NAMES
 );
 // SHOULD I PUT THIS IN AN INITIAL BLOCK?
-	// Internal net instantiation
-	
-	// Originates from programCounter
-	logic	[63:0]	pc_instrMem_addr				=	'0;
-	
-	// Originates from instrMemory
-	logic	[31:0]	instrMem_instrDec_instr		=	'0;
-	
-	// Originates from instrDecoder
-	logic [6:0]    opcode	=	'0;
-   logic [4:0]		rs1		=	'0;
-   logic [4:0] 	rs2		=	'0;
-   logic [4:0] 	rd			=	'0;
-   logic [11:0]   imm		=	'0;
-   logic [2:0]    funct3	=	'0;
-   logic [6:0]		funct7	=	'0;
-	
-	// Originates from controlUnit
-	
-	// Originates from regFile
-	logic [REG_DATA_WIDTH-1:0]		regFile_ALU_data1		= '0;
-	logic [REG_DATA_WIDTH-1:0]		regFile_ALU_data2		= '0;
-	
-	
-	logic [REG_DATA_WIDTH-1:0]		write_data	= '0;
-	
-	
-	// Module instantiation
-	
-	// ADD SUPPORT FOR PARAMETERS
+   // Internal net instantiation
+   
+   // Originates from programCounter
+   logic [63:0]   pc_instrMem_addr           =  '0;
+   
+   // Originates from instrMemory
+   logic [31:0]   instrMem_instrDec_instr    =  '0;
+   
+   // Originates from instrDecoder
+   logic [6:0]    opcode   =  '0;
+   logic [4:0]    rs1      =  '0;
+   logic [4:0]    rs2      =  '0;
+   logic [4:0]    rd       =  '0;
+   logic [11:0]   imm      =  '0;
+   logic [2:0]    funct3   =  '0;
+   logic [6:0]    funct7   =  '0;
+   
+   // Originates from controlUnit
+   
+   // Originates from regFile
+   logic [REG_DATA_WIDTH-1:0]    regFile_ALU_data1    = '0;
+   logic [REG_DATA_WIDTH-1:0]    regFile_ALU_data2    = '0;
+   
+   
+   logic [REG_DATA_WIDTH-1:0]    write_data  = '0;
+   
+   
+   // Module instantiation
+   
+   // ADD SUPPORT FOR PARAMETERS
 
-	ProgramCounter programCounter(
+   ProgramCounter programCounter(
       .clk_in(clk_in),
       .reset(),
-		.instr_in(),
+      .instr_in(),
       .instr_out(pc_instrMem_addr)
    );
-	
-	InstrMemory instrMemory(
+   
+   InstrMemory instrMemory(
       .addr_in(pc_instrMem_addr),
       .instr_out(instrMem_instrDec_instr)
    );
-	
-	InstrDecoder instrDecoder(
+   
+   InstrDecoder instrDecoder(
       .instr_in(instrMem_instrDec_instr),
-		.opcode_out(opcode),
+      .opcode_out(opcode),
       .rs1_out(rs1),
       .rs2_out(rs2),
       .rd_out(rd),
@@ -64,13 +64,13 @@
       .funct3_out(funct3),
       .funct7_out(funct7)
    );
-	
-	RegFile regFile #(
+   
+   RegFile regFile #(
       .REG_DATA_WIDTH_POW(REG_DATA_WIDTH_POW)
-	)(
-		.clk_in(clk_in),
-		.reset(),
-		.write_en(),
+   )(
+      .clk_in(clk_in),
+      .reset(),
+      .write_en(),
       .rs1_in(rs1),
       .rs2_in(rs2),
       .rd_in(rd),
@@ -78,9 +78,9 @@
       .reg_data1_out(regFile_ALU_data1),
       .reg_data2_out(regFile_ALU_data2)
    );
-	
-	unique case (/*expression*/)		// MUX to switch between IMM & Register 2 Data
-		
+   
+   unique case (/*expression*/)     // MUX to switch between IMM & Register 2 Data
+      
 
    ALU alu (
       .operand1_in(), 
