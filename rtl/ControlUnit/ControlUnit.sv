@@ -16,7 +16,7 @@ typedef enum logic {
    REG_SRC_ALU   
 } Reg_Data_Src_t;
 
-//module ControlUnit import control_signals::*; ( // 1'b0 = OFF 1'b1 = ON //COMMENT WHEN DOING FORMAL VERIFICATION
+//module ControlUnit import ControlSignals::*; ( // 1'b0 = OFF 1'b1 = ON //COMMENT WHEN DOING FORMAL VERIFICATION
 module ControlUnit( // 1'b0 = OFF 1'b1 = ON // UNCOMMENT WHEN DOING FORMAL VERIFICATION
    input    logic [6:0]          opcode_in,
    input    logic [2:0]          funct3_in,
