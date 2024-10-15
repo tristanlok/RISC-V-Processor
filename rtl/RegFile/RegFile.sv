@@ -6,12 +6,12 @@ module RegFile #(
 )(
    input    logic                         clk_in,
    input    logic                         reset,
-   input    logic                         write_en,
+   input    logic                         regWrite_ctrl,                   // Enable control to write into Register File
    input    logic [4:0]                   rs1_in, rs2_in,                  // register numbers to read data from
    input    logic [4:0]                   rd_in,                           // register number to write data to
-   input    logic [REG_DATA_WIDTH-1:0]    write_data_in,                   // data to be written into target register
+   input    logic [REG_DATA_WIDTH-1:0]    writeData_in,                    // data to be written into target register
 
-   output   logic [REG_DATA_WIDTH-1:0]    reg_data1_out, reg_data2_out     // data output of the two specified registers
+   output   logic [REG_DATA_WIDTH-1:0]    regData1_out, regData2_out       // data output of the two specified registers
 );
 
    logic [REG_DATA_WIDTH-1:0] registers [0:GEN_REG_COUNT-1];     // 32 64-bit general registers 
@@ -29,8 +29,8 @@ module RegFile #(
    
    // Combinational Logic for decoding register number into register data
 
-   assign reg_data1_out = registers[rs1_in];
-   assign reg_data2_out = registers[rs2_in];
+   assign regData1_out = registers[rs1_in];
+   assign regData2_out = registers[rs2_in];
 
    // Sequential Logic for writing data into the target register
 
@@ -45,8 +45,8 @@ module RegFile #(
          end
          */
       
-      end else if (write_en && (rd_in != 0)) begin
-         registers[rd_in] <= write_data_in;
+      end else if (regWrite_ctrl && (rd_in != 0)) begin
+         registers[rd_in] <= writeData_in;
       end
    end
 
