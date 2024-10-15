@@ -1,0 +1,18 @@
+[options]
+mode prove
+depth 20
+expect pass
+
+[engines]
+smtbmc yices
+smtbmc boolector
+
+[script]
+read -sv InstrMemory.sv
+read -sv InstrMemory_assertions.sv
+prep -top InstrMemory_assertions
+memory_map -rom-only
+
+[files]
+../../rtl/InstrMemory/InstrMemory.sv
+InstrMemory_assertions.sv

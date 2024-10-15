@@ -1,0 +1,17 @@
+[options]
+mode prove
+depth 20
+expect pass
+
+[engines]
+smtbmc yices
+smtbmc boolector
+
+[script]
+read -formal InstrDecoder.sv
+read -formal InstrDecoder_assertions.sv
+prep -top InstrDecoder_assertions
+
+[files]
+../../rtl/InstrDecoder/InstrDecoder.sv
+InstrDecoder_assertions.sv
