@@ -1,20 +1,20 @@
 module RegFile #(
-   parameter   REG_DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
-   localparam  REG_DATA_WIDTH = 1 << REG_DATA_WIDTH_POW,
+   parameter   DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
+   localparam  DATA_WIDTH = 1 << DATA_WIDTH_POW,
    
-   localparam  GEN_REG_COUNT = 32                           // RISC-V only supports 32 General Purpose Registers
+   localparam  GEN_REG_COUNT = 32                       // RISC-V only supports 32 General Purpose Registers
 )(
-   input    logic                         clk_in,
-   input    logic                         reset,
-   input    logic                         regWrite_ctrl,                   // Enable control to write into Register File
-   input    logic [4:0]                   rs1_in, rs2_in,                  // register numbers to read data from
-   input    logic [4:0]                   rd_in,                           // register number to write data to
-   input    logic [REG_DATA_WIDTH-1:0]    writeData_in,                    // data to be written into target register
+   input    logic                     clk_in,
+   input    logic                     reset,
+   input    logic                     regWrite_ctrl,                   // Enable control to write into Register File
+   input    logic [4:0]               rs1_in, rs2_in,                  // register numbers to read data from
+   input    logic [4:0]               rd_in,                           // register number to write data to
+   input    logic [DATA_WIDTH-1:0]    writeData_in,                    // data to be written into target register
 
-   output   logic [REG_DATA_WIDTH-1:0]    regData1_out, regData2_out       // data output of the two specified registers
+   output   logic [DATA_WIDTH-1:0]    regData1_out, regData2_out       // data output of the two specified registers
 );
 
-   logic [REG_DATA_WIDTH-1:0] registers [0:GEN_REG_COUNT-1];     // 32 64-bit general registers 
+   logic [DATA_WIDTH-1:0] registers [0:GEN_REG_COUNT-1];     // 32 64-bit general registers 
    
    // ONLY USED FOR FORMAL VERIFICATION TO INITIALIZE REGISTERS AS '0
    /*
