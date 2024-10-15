@@ -14,11 +14,11 @@ Internal Functions:
 
 // FOR FORMAL VERIFICATION ONLY -> UNCOMMENT FOR PRODUCTION
 typedef enum logic [2:0] {
-   OP_ADD = 3'b111,  // ALU operation: Add
-   OP_SUB = 3'b000,  // ALU operation: Subtract
-   OP_AND = 3'b001,  // ALU operation: AND
-   OP_OR  = 3'b011   // ALU operation: OR
-} Alu_Operation_t;
+   OP_ADD = 3'b111,
+   OP_SUB = 3'b000,
+   OP_AND = 3'b001,
+   OP_OR  = 3'b011
+} aluOperation_t;
 
 //module ALU import ControlSignals::Alu_Operation_t(
 module ALU (
