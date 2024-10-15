@@ -26,7 +26,7 @@ module ALU (
 
 module ALU import ControlSignals::*; #(
    parameter   DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
-   localparam  DATA_WIDTH = 1 << DATA_WIDTH_POW
+   parameter   DATA_WIDTH = 1 << DATA_WIDTH_POW
  )(
    input    logic [DATA_WIDTH-1:0]    operand1_in,
    input    logic [DATA_WIDTH-1:0]    operand2_in,
@@ -44,7 +44,7 @@ module ALU import ControlSignals::*; #(
 
    // subEnable and create operand2Modified
    always_comb begin
-      subEnable = ~&aluOpcode_in;
+      subEnable = ~&aluOp_in;
       
       operand2Modified = operand2_in ^ {DATA_WIDTH{subEnable}}; // {64{subEnable}} replicates subEnable 64 times to become
    end

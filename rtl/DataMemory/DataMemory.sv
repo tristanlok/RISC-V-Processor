@@ -18,16 +18,16 @@ Note: right now, only word addressable is implemented, FUTURE: have byteEnable f
 
 module DataMemory #(
    parameter   DATA_WIDTH_POW = 6,                    // Using Powers as Parameter ensures width is a power of 2
-   localparam  DATA_WIDTH = 1 << DATA_WIDTH_POW,
+   parameter   DATA_WIDTH = 1 << DATA_WIDTH_POW,
    
    parameter   ADDR_WIDTH_POW = 6,                    // Using Powers as Parameter ensures width is a power of 2
-   localparam  ADDR_WIDTH = 1 << ADDR_WIDTH_POW,
+   parameter   ADDR_WIDTH = 1 << ADDR_WIDTH_POW,
    
    parameter   MEM_DEPTH_POW = 12,                    //how many words are stored in the memory block? (2^x)
-   localparam  MEM_DEPTH = 1 << MEM_DEPTH_POW,        //number of words stored (converted from MEM_MEM_DEPTH_POW)
+   parameter   MEM_DEPTH = 1 << MEM_DEPTH_POW,        //number of words stored (converted from MEM_MEM_DEPTH_POW)
    
-   localparam  WORD_BYTES_POW = 3,                    //how many bytes are in a word? (2^x)
-   localparam  WORD_BYTES = 1 << WORD_BYTES_POW       //number of bytes in a word (converted from WORD_BYTES_POW)
+   parameter   WORD_BYTES_POW = 3,                    //how many bytes are in a word? (2^x)
+   parameter   WORD_BYTES = 1 << WORD_BYTES_POW       //number of bytes in a word (converted from WORD_BYTES_POW)
 )(
    input    logic                   clk_in,           //clock signal
    input    logic                   reset,            //reset
@@ -57,7 +57,7 @@ module DataMemory #(
    // calculate word line number from the memory address
    always_comb begin
       /* verilator lint_off WIDTHTRUNC */ // to implement: check if the calculated wordNumber exceeds the max >MEM_DEPTH-1
-      wordNumber = addr_in >> WORD_BYTES_POW; //divide the byte address by the number of bytes in a word to get the wordline nubmer
+      wordNumber = (MEM_DEPTH_POW-1)'(addr_in >> WORD_BYTES_POW); //divide the byte address by the number of bytes in a word to get the wordline number [CASTED TO AVOID WARNING]
    end
 
    // asynchronous reading

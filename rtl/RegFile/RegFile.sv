@@ -1,8 +1,8 @@
 module RegFile #(
    parameter   DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
-   localparam  DATA_WIDTH = 1 << DATA_WIDTH_POW,
+   parameter   DATA_WIDTH = 1 << DATA_WIDTH_POW,
    
-   localparam  GEN_REG_COUNT = 32                       // RISC-V only supports 32 General Purpose Registers
+   parameter   GEN_REG_COUNT = 32                       // RISC-V only supports 32 General Purpose Registers
 )(
    input    logic                     clk_in,
    input    logic                     reset,

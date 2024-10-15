@@ -1,6 +1,6 @@
 module ProgramCounter #(
    parameter   ADDR_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
-   localparam  ADDR_WIDTH = 1 << ADDR_WIDTH_POW,
+   parameter   ADDR_WIDTH = 1 << ADDR_WIDTH_POW
 )(
    input    logic                    clk_in,
    input    logic                    reset,

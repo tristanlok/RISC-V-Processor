@@ -1,12 +1,12 @@
 module InstrMemory #(
    parameter   ADDR_WIDTH_POW = 6,                 // Using Powers as Parameter ensures width is a power of 2
-   localparam  ADDR_WIDTH = 1 << ADDR_WIDTH_POW,   // Size of an address
+   parameter   ADDR_WIDTH = 1 << ADDR_WIDTH_POW,   // Size of an address
    
    parameter   MEM_DEPTH_POW = 10,                 // Default depth of instruction memory 2^10 * 4 = 4 KB
-   localparam  MEM_DEPTH = 1 << MEM_DEPTH_POW,      // Number of instructions stored in instruction memory
+   parameter   MEM_DEPTH = 1 << MEM_DEPTH_POW,     // Number of instructions stored in instruction memory
    
-   localparam  WORD_SIZE_POW = 2,                  // Size of Word (in bytes) in terms of power of 2 (4)
-   localparam  WORD_SIZE = 1 << WORD_SIZE_POW     // Size of Word in bytes (1 * 2^2)
+   parameter   WORD_SIZE_POW = 2,                  // Size of Word (in bytes) in terms of power of 2 (4)
+   parameter   WORD_SIZE = 1 << WORD_SIZE_POW      // Size of Word in bytes (1 * 2^2)
 ) 
 (
    input    logic [ADDR_WIDTH-1:0]     addr_in,
