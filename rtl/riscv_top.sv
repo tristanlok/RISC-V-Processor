@@ -2,19 +2,19 @@
    // Parameters to configure Data Size (32-bit, 64-bit, 128-bit, etc.)
    parameter   DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
    localparam  DATA_WIDTH = 1 << DATA_WIDTH_POW,
-	
-	// Parameters to configure Address Size (32-bit, 64-bit, 128-bit, etc.)
-	parameter   ADDR_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
+   
+   // Parameters to configure Address Size (32-bit, 64-bit, 128-bit, etc.)
+   parameter   ADDR_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
    localparam  ADDR_WIDTH = 1 << ADDR_WIDTH_POW,
-	
-	// Parameter to configure the depth of Instruction Memory (in terms of powers of 2)
-	parameter	INSTR_MEM_DEPTH_POW = 10,
-	
-	// Parameter to configure the depth of Instruction Memory (in terms of powers of 2)
-	parameter	DATA_MEM_DEPTH_POW = 12
+   
+   // Parameter to configure the depth of Instruction Memory (in terms of powers of 2)
+   parameter   INSTR_MEM_DEPTH_POW = 10,
+   
+   // Parameter to configure the depth of Instruction Memory (in terms of powers of 2)
+   parameter   DATA_MEM_DEPTH_POW = 12
  )(
-    input   logic		clk_in,
-	 input	logic		reset
+    input   logic    clk_in,
+    input   logic    reset
     // add reset and maybe change reset pin names
     
     // ALL I/O CHANGES MUST BE REFLECTED IN FV FILES TOO
@@ -26,8 +26,8 @@
    // Misc.
    logic [DATA_WIDTH-1:0]    imm_ext;
    logic [DATA_WIDTH-1:0]    mux_alu_data;
-	logic [DATA_WIDTH-1:0]    mux_reg_data;
-	logic							  branch_mux_ctrl;
+   logic [DATA_WIDTH-1:0]    mux_reg_data;
+   logic                     branch_mux_ctrl;
    
    // Originates from programCounter
    logic [ADDR_WIDTH-1:0]    pc_instrMem_addr;
@@ -56,13 +56,13 @@
    // Originates from regFile
    logic [DATA_WIDTH-1:0]    regFile_ALU_data1;
    logic [DATA_WIDTH-1:0]    regFile_data2;
-	
-	// Originates from ALU
-	logic [DATA_WIDTH-1:0]	  aluResult;
-	logic 						  zeroFlag;
-	
-	// Originates from dataMemory
-	logic [DATA_WIDTH-1:0]		dataMem_mux_data;
+   
+   // Originates from ALU
+   logic [DATA_WIDTH-1:0]    aluResult;
+   logic                     zeroFlag;
+   
+   // Originates from dataMemory
+   logic [DATA_WIDTH-1:0]     dataMem_mux_data;
    
    
    
@@ -81,7 +81,7 @@
    
    InstrMemory instrMemory #(
       .ADDR_WIDTH_POW(ADDR_WIDTH_POW),
-		.MEM_DEPTH_POW(INSTR_MEM_DEPTH_POW)
+      .MEM_DEPTH_POW(INSTR_MEM_DEPTH_POW)
    )(
       .addr_in(pc_instrMem_addr),
       .instr_out(instrMem_instrDec_instr)
@@ -149,7 +149,7 @@
    DataMemory dataMemory #(
       .DATA_WIDTH_POW(DATA_WIDTH_POW)
       .ADDR_WIDTH_POW(ADDR_WIDTH_POW),
-		.MEM_DEPTH_POW(DATA_MEM_DEPTH_POW)
+      .MEM_DEPTH_POW(DATA_MEM_DEPTH_POW)
    )(
       .clk_in(clk_in),
       .reset(),
@@ -157,7 +157,7 @@
       .memRead_ctrl(memRead),
       .addr_in(aluResult),
       .data_in(regFile_data2),
-		.data_out(dataMem_mux_data)
+      .data_out(dataMem_mux_data)
    );
    
    // MUX to switch between ALU & Data Memory Data
@@ -167,8 +167,8 @@
          REG_SRC_ALU: mux_reg_data = aluResult;
       endcase;
    end
-	
-	// Branch Logic
-	assign branch_mux_ctrl = zeroFlag && branchCtrl;
+   
+   // Branch Logic
+   assign branch_mux_ctrl = zeroFlag && branchCtrl;
    
 endmodule
