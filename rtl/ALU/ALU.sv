@@ -28,12 +28,12 @@ module ALU import ControlSignals::*; #(
    parameter   DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
    localparam  DATA_WIDTH = 1 << DATA_WIDTH_POW
  )(
-   input    logic [REG_DATA_WIDTH-1:0]    operand1_in,
-   input    logic [REG_DATA_WIDTH-1:0]    operand2_in,
-   input    aluOperation_t                aluOp_in,
+   input    logic [DATA_WIDTH-1:0]    operand1_in,
+   input    logic [DATA_WIDTH-1:0]    operand2_in,
+   input    aluOperation_t            aluOp_in,
    
-   output   logic [REG_DATA_WIDTH-1:0]    result_out,
-   output   logic                         zeroFlag_out
+   output   logic [DATA_WIDTH-1:0]    result_out,
+   output   logic                     zeroFlag_out
 );
 
    logic                    subEnable;
