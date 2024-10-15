@@ -25,8 +25,8 @@ module ALU (
 */
 
 module ALU import ControlSignals::*; #(
-   parameter   REG_DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
-   localparam  REG_DATA_WIDTH = 1 << REG_DATA_WIDTH_POW
+   parameter   DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
+   localparam  DATA_WIDTH = 1 << DATA_WIDTH_POW
  )(
    input    logic [REG_DATA_WIDTH-1:0]    operand1_in,
    input    logic [REG_DATA_WIDTH-1:0]    operand2_in,
@@ -36,17 +36,17 @@ module ALU import ControlSignals::*; #(
    output   logic                         zeroFlag_out
 );
 
-   logic                        subEnable;
-   logic [REG_DATA_WIDTH-1:0]   operand2Modified;     // inverted version of operand2_in if subtraction is enabled for 2's complement
-   logic [REG_DATA_WIDTH-1:0]   orResult;
-   logic [REG_DATA_WIDTH-1:0]   andResult;
-   logic [REG_DATA_WIDTH-1:0]   adderResult;
+   logic                    subEnable;
+   logic [DATA_WIDTH-1:0]   operand2Modified;     // inverted version of operand2_in if subtraction is enabled for 2's complement
+   logic [DATA_WIDTH-1:0]   orResult;
+   logic [DATA_WIDTH-1:0]   andResult;
+   logic [DATA_WIDTH-1:0]   adderResult;
 
    // subEnable and create operand2Modified
    always_comb begin
       subEnable = ~&aluOpcode_in;
       
-      operand2Modified = operand2_in ^ {REG_DATA_WIDTH{subEnable}}; // {64{subEnable}} replicates subEnable 64 times to become
+      operand2Modified = operand2_in ^ {DATA_WIDTH{subEnable}}; // {64{subEnable}} replicates subEnable 64 times to become
    end
 
    // Full Adder/Subtractor (terminate carry_out)
