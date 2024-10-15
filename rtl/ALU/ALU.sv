@@ -21,7 +21,7 @@ typedef enum logic [2:0] {
    OP_OR  = 3'b011
 } aluOperation_t;
 
-module ALU (
+module ALU #(
 */
 
 module ALU import ControlSignals::*; #(
