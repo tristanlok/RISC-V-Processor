@@ -1,44 +1,40 @@
-module reg_file_assertions #(
-   parameter   REG_DATA_WIDTH_POW = 6,
-   localparam  REG_DATA_WIDTH = 1 << REG_DATA_WIDTH_POW,
-
-   parameter   REG_MEM_DEPTH_POW = 5,
-   localparam  REG_MEM_DEPTH = 1 << REG_MEM_DEPTH_POW
+module RegFile_assertions #(
+   parameter   DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
+   parameter   DATA_WIDTH = 1 << DATA_WIDTH_POW,
+   
+   parameter   GEN_REG_COUNT = 32                       // RISC-V only supports 32 General Purpose Registers
 )(
-   input logic [REG_MEM_DEPTH_POW-1:0]    rs1_in, rs2_in,
-   input logic [REG_MEM_DEPTH_POW-1:0]    rd_in,
-   
-   input logic [REG_DATA_WIDTH-1:0]       data_write,
-   input logic                            clk_in,
-   input logic                            write_en,
-   input logic                            reset,
-   
-   output logic [REG_DATA_WIDTH-1:0]      reg_data1_out, reg_data2_out
+   input    logic                     clk_in,
+   input    logic                     reset,
+   input    logic                     regWrite_ctrl,                   // Enable control to write into Register File
+   input    logic [4:0]               rs1_in, rs2_in,                  // register numbers to read data from
+   input    logic [4:0]               rd_in,                           // register number to write data to
+   input    logic [DATA_WIDTH-1:0]    writeData_in,                    // data to be written into target register
+
+   output   logic [DATA_WIDTH-1:0]    regData1_out, regData2_out       // data output of the two specified registers
 );
 
-
    // Instantiate the DUT (Design Under Test)
-   reg_file #(
-      .REG_DATA_WIDTH_POW(REG_DATA_WIDTH_POW),
-      .REG_MEM_DEPTH_POW(REG_MEM_DEPTH_POW)
+   RegFile #(
+      .DATA_WIDTH_POW(DATA_WIDTH_POW)
    ) DUT (
       .rs1_in(rs1_in),
       .rs2_in(rs2_in),
       .rd_in(rd_in),
-      .data_write(data_write),
+      .writeData_in(writeData_in),
       .clk_in(clk_in),
-      .write_en(write_en),
+      .regWrite_ctrl(regWrite_ctrl),
       .reset(reset),
-      .reg_data1_out(reg_data1_out),
-      .reg_data2_out(reg_data2_out)
+      .regData1_out(regData1_out),
+      .regData2_out(regData2_out)
    );
    
-   logic [REG_MEM_DEPTH_POW-1:0]    rs1_in_d; // previous rs1 register
-   logic [REG_MEM_DEPTH_POW-1:0]    rs2_in_d; // previous rs2 register
-   logic [REG_MEM_DEPTH_POW-1:0]    rd_in_d; // prevous destination register
-   logic [REG_DATA_WIDTH-1:0]       data_write_d; // previous data to write
-   logic [REG_DATA_WIDTH-1:0]       data_read1_d; // previous data read from rs1
-   logic [REG_DATA_WIDTH-1:0]       data_read2_d; // previous data read from rs2
+   logic [4:0]    rs1_in_d; // previous rs1 register
+   logic [4:0]    rs2_in_d; // previous rs2 register
+   logic [4:0]    rd_in_d; // prevous destination register
+   logic [DATA_WIDTH-1:0]       writeData_in_d; // previous data to write
+   logic [DATA_WIDTH-1:0]       data_read1_d; // previous data read from rs1
+   logic [DATA_WIDTH-1:0]       data_read2_d; // previous data read from rs2
    
    logic                            bit_written; // goes high one cycle after a bit is written
    logic                            was_reset;
@@ -49,7 +45,7 @@ module reg_file_assertions #(
       rd_in_d      = '0;       // Initialize to zero
       rs1_in_d      = '0;       // Initialize to zero
       rs2_in_d      = '0;       // Initialize to zero
-      data_write_d = '0;          // Initialize to zero
+      writeData_in_d = '0;          // Initialize to zero
       data_read1_d = '0;         // Initialize to zero
       data_read2_d = '0;          // Initialize to zero
       was_reset = '0;            // Initialize to zero
@@ -57,13 +53,13 @@ module reg_file_assertions #(
    end
    
    always_ff @(posedge clk_in) begin
-      assume(rs1_in < REG_MEM_DEPTH); // Constrain register index
-      assume(rs2_in < REG_MEM_DEPTH); // Constrain register index
-      assume(rd_in < REG_MEM_DEPTH);  // Constrain write index
+      assume(rs1_in < GEN_REG_COUNT); // Constrain register index
+      assume(rs2_in < GEN_REG_COUNT); // Constrain register index
+      assume(rd_in < GEN_REG_COUNT);  // Constrain write index
       
-      assume(reset + write_en < 2);
+      assume(reset + regWrite_ctrl < 2);
       
-      assume(write_en == 1'b0 || write_en == 1'b1);  // Ensure write enable is binary
+      assume(regWrite_ctrl == 1'b0 || regWrite_ctrl == 1'b1);  // Ensure write enable is binary
    end
 
    // Saving delayed values
@@ -71,8 +67,8 @@ module reg_file_assertions #(
       rd_in_d <= rd_in; // delayed rd_in value
       rs1_in_d <= rs1_in; // delayed rs1_in value
       rs2_in_d <= rs2_in; //delayed rs2_in value
-      data_read1_d <= reg_data1_out; // delayed rs1 out
-      data_read2_d <= reg_data2_out; // delayed rs2 out
+      data_read1_d <= regData1_out; // delayed rs1 out
+      data_read2_d <= regData2_out; // delayed rs2 out
       
       if (reset) begin
          was_reset <= 1'b1;
@@ -80,8 +76,8 @@ module reg_file_assertions #(
          was_reset <= 1'b0;
       end
       
-      if (write_en && (rd_in != 0)) begin
-         data_write_d <= data_write; // delayed written value
+      if (regWrite_ctrl && (rd_in != 0)) begin
+         writeData_in_d <= writeData_in; // delayed written value
          bit_written <= 1'b1;
       end else begin
          bit_written <= 1'b0;
@@ -93,47 +89,47 @@ module reg_file_assertions #(
    // read after write integrity check
    always_ff @(posedge clk_in) begin
       if (bit_written && (rd_in_d == rs1_in)) begin // bit was written and read reg is same as written reg
-         assert(reg_data1_out == data_write_d);
+         assert(regData1_out == writeData_in_d);
       end
    end
    
    always_ff @(posedge clk_in) begin
       if (bit_written && (rd_in_d == rs2_in)) begin // bit was written and read reg is same as written reg
-         assert(reg_data2_out == data_write_d);
+         assert(regData2_out == writeData_in_d);
       end
    end
 
-   // check write_en low means rd register stays same after 
+   // check regWrite_ctrl low means rd register stays same after 
    
    always_ff @(posedge clk_in) begin
        if (!was_reset && !bit_written && (rs1_in_d == rd_in_d) && (rs1_in == rs1_in_d)) begin // no write and read reg is same as was not written reg
-           assert(data_read1_d == reg_data1_out);
+           assert(data_read1_d == regData1_out);
        end
    end
    
    always_ff @(posedge clk_in) begin
        if (!was_reset && !bit_written && (rs2_in_d == rd_in_d) && (rs2_in == rs2_in_d)) begin // no write and read reg is same was was not written reg
-           assert(data_read2_d == reg_data2_out);
+           assert(data_read2_d == regData2_out);
        end
    end
    
    // register zero behaviour
    always_ff @(posedge clk_in) begin
       if (rs1_in == 0) begin // read reg is 0
-         assert (reg_data1_out == 0);
+         assert (regData1_out == 0);
       end
    end
    
    always_ff @(posedge clk_in) begin
       if (rs2_in == 0) begin // read reg is 0
-         assert (reg_data2_out == 0);
+         assert (regData2_out == 0);
       end
    end
    
    // reset behaviour
    always_ff @(posedge clk_in) begin
       if (was_reset) begin
-         assert (reg_data1_out == '0 && reg_data2_out == '0);
+         assert (regData1_out == '0 && regData2_out == '0);
       end
    end
 
