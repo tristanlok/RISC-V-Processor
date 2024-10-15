@@ -30,7 +30,7 @@ module ALU import ControlSignals::*; #(
  )(
    input    logic [REG_DATA_WIDTH-1:0]    operand1_in,
    input    logic [REG_DATA_WIDTH-1:0]    operand2_in,
-   input    aluOperation_t                aluOpcode_in,
+   input    aluOperation_t                aluOp_in,
    
    output   logic [REG_DATA_WIDTH-1:0]    result_out,
    output   logic                         zeroFlag_out
@@ -65,7 +65,7 @@ module ALU import ControlSignals::*; #(
 
    // Multiplexer to choose result
    always_comb begin
-      unique case (aluOpcode_in)
+      unique case (aluOp_in)
          OP_SUB:  result_out = adderResult;
          OP_AND:  result_out = andResult;
          OP_OR:   result_out = orResult;
