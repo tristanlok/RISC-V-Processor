@@ -1,9 +1,20 @@
  module riscv_top import ControlSignals::*; #(
-   // Parameters to configure Register Size (32-bit, 64-bit, 128-bit, etc.)
-   parameter   REG_DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
-   localparam  REG_DATA_WIDTH = 1 << REG_DATA_WIDTH_POW,
+   // Parameters to configure Data Size (32-bit, 64-bit, 128-bit, etc.)
+   parameter   DATA_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
+   localparam  DATA_WIDTH = 1 << DATA_WIDTH_POW,
+	
+	// Parameters to configure Address Size (32-bit, 64-bit, 128-bit, etc.)
+	parameter   ADDR_WIDTH_POW = 6,                      // Using Powers as Parameter ensures width is a power of 2
+   localparam  ADDR_WIDTH = 1 << ADDR_WIDTH_POW,
+	
+	// Parameter to configure the depth of Instruction Memory (in terms of powers of 2)
+	parameter	INSTR_MEM_DEPTH_POW = 10,
+	
+	// Parameter to configure the depth of Instruction Memory (in terms of powers of 2)
+	parameter	DATA_MEM_DEPTH_POW = 12
  )(
-    input   logic       clk_in
+    input   logic		clk_in,
+	 input	logic		reset
     // add reset and maybe change reset pin names
     
     // ALL I/O CHANGES MUST BE REFLECTED IN FV FILES TOO
@@ -13,11 +24,13 @@
    // Internal net instantiation
    
    // Misc.
-   logic [63:0]   imm_ext;
-   logic [63:0]   mux_alu_data;
+   logic [DATA_WIDTH-1:0]    imm_ext;
+   logic [DATA_WIDTH-1:0]    mux_alu_data;
+	logic [DATA_WIDTH-1:0]    mux_reg_data;
+	logic							  branch_mux_ctrl;
    
    // Originates from programCounter
-   logic [63:0]   pc_instrMem_addr;
+   logic [ADDR_WIDTH-1:0]    pc_instrMem_addr;
    
    // Originates from instrMemory
    logic [31:0]   instrMem_instrDec_instr;
@@ -41,11 +54,18 @@
    logic             branchCtrl;
    
    // Originates from regFile
-   logic [REG_DATA_WIDTH-1:0]    regFile_ALU_data1;
-   logic [REG_DATA_WIDTH-1:0]    regFile_ALU_data2;
+   logic [DATA_WIDTH-1:0]    regFile_ALU_data1;
+   logic [DATA_WIDTH-1:0]    regFile_data2;
+	
+	// Originates from ALU
+	logic [DATA_WIDTH-1:0]	  aluResult;
+	logic 						  zeroFlag;
+	
+	// Originates from dataMemory
+	logic [DATA_WIDTH-1:0]		dataMem_mux_data;
    
    
-   logic [REG_DATA_WIDTH-1:0]    write_data;
+   
    
    
    // Module instantiation
@@ -59,7 +79,10 @@
       .instr_out(pc_instrMem_addr)
    );
    
-   InstrMemory instrMemory(
+   InstrMemory instrMemory #(
+      .ADDR_WIDTH_POW(ADDR_WIDTH_POW),
+		.MEM_DEPTH_POW(INSTR_MEM_DEPTH_POW)
+   )(
       .addr_in(pc_instrMem_addr),
       .instr_out(instrMem_instrDec_instr)
    );
@@ -76,7 +99,7 @@
    );
    
    // Sign-extend IMM
-   assign imm_ext = {{(REG_DATA_WIDTH-12){imm_12b[11]}}, imm_12b};      // Replicates imm_12b's MSB [REG_DATA_WIDTH-12] times (currently 52), then concatenates it ahead of imm_12b
+   assign imm_ext = {{(DATA_WIDTH-12){imm_12b[11]}}, imm_12b};      // Replicates imm_12b's MSB [DATA_WIDTH-12] times (currently 52), then concatenates it ahead of imm_12b
    
    ControlUnit controlUnit(
       .opcode_in(opcode),
@@ -92,44 +115,60 @@
    );
    
    RegFile regFile #(
-      .REG_DATA_WIDTH_POW(REG_DATA_WIDTH_POW)
+      .DATA_WIDTH_POW(DATA_WIDTH_POW)
    )(
       .clk_in(clk_in),
       .reset(),
-      .regWrite_ctrl(),
+      .regWrite_ctrl(regWrite),
       .rs1_in(rs1),
       .rs2_in(rs2),
       .rd_in(rd),
-      .writeData_in(write_data),
+      .writeData_in(mux_reg_data),
       .regData1_out(regFile_ALU_data1),
-      .regData2_out(regFile_ALU_data2)
+      .regData2_out(regFile_data2)
    );
    
    // MUX to switch between IMM & Register 2 Data
    always_comb begin
       unique case (aluSrcCtrl)
-         ALU_SRC_REG: mux_alu_data = regFile_ALU_data2;
+         ALU_SRC_REG: mux_alu_data = regFile_data2;
          ALU_SRC_IMM: mux_alu_data = imm_ext;
       endcase;
    end      
 
-   ALU alu (
-      .operand1_in(), 
-      .operand2_in(), 
-      .aluOpcode_in(), 
-      .result_out(), 
-      .zeroFlag_out()
+   ALU alu #(
+      .DATA_WIDTH_POW(DATA_WIDTH_POW)
+   )(
+      .operand1_in(regFile_ALU_data1), 
+      .operand2_in(mux_alu_data), 
+      .aluOp_in(aluOp), 
+      .result_out(aluResult), 
+      .zeroFlag_out(zeroFlag)
    );
    
-   DataMemory dataMemory(
-      .address_in(),
-      .data_in(),
-      .writeEnable_in(),
-      .readEnable_in(),
-      .clk_in(),
-      .reset()
+   DataMemory dataMemory #(
+      .DATA_WIDTH_POW(DATA_WIDTH_POW)
+      .ADDR_WIDTH_POW(ADDR_WIDTH_POW),
+		.MEM_DEPTH_POW(DATA_MEM_DEPTH_POW)
+   )(
+      .clk_in(clk_in),
+      .reset(),
+      .memWrite_ctrl(memWrite),
+      .memRead_ctrl(memRead),
+      .addr_in(aluResult),
+      .data_in(regFile_data2),
+		.data_out(dataMem_mux_data)
    );
    
-   
+   // MUX to switch between ALU & Data Memory Data
+   always_comb begin
+      unique case (regSrcCtrl)
+         REG_SRC_MEM: mux_reg_data = dataMem_mux_data;
+         REG_SRC_ALU: mux_reg_data = aluResult;
+      endcase;
+   end
+	
+	// Branch Logic
+	assign branch_mux_ctrl = zeroFlag && branchCtrl;
    
 endmodule
