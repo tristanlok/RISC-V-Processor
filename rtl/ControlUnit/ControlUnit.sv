@@ -18,7 +18,6 @@ typedef enum logic {
 } regDataSrc_t;
 
 module ControlUnit( 
-
 */
 
 module ControlUnit import ControlSignals::*; ( // 1'b0 = OFF 1'b1 = ON
