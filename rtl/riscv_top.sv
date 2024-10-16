@@ -169,7 +169,7 @@
    assign incr_pc_addr = curr_pc_addr + 4;
    
    // BEQ Adder - Adds (IMM) mem offset value to the incremented (next) address
-   assign beq_addr = incr_pc_addr + imm_ext;
+   assign beq_addr = curr_pc_addr + imm_ext;
    
    // MUX to switch between Incremented Address and Branched Address
    always_comb begin
