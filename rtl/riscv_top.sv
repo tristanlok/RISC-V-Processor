@@ -16,24 +16,24 @@
     input   logic    clk_in,
     input   logic    reset
 );
-   // Internal net instantiation
    
-   // Misc.
-   logic [DATA_WIDTH-1:0]    imm_ext;
-   logic [DATA_WIDTH-1:0]    mux_alu_data;
-   logic [DATA_WIDTH-1:0]    mux_reg_data;
+	//----------------Internal Signals Begin---------------
+
+   logic [DATA_WIDTH-1:0]    imm_ext; // Sign-extended to 64-bit instructin immediate value
+   logic [DATA_WIDTH-1:0]    mux_alu_data; // controls ALU operand2 data source (rs2 or imm)
+   logic [DATA_WIDTH-1:0]    mux_reg_data; // controls the rd data source (alu result or read from data memory)
    
-   logic                     branch_mux_ctrl;
+   logic                     branch_mux_ctrl; // controls whether branch is taken (high if inst is BEQ AND zeroFlag set)
    
-   logic [ADDR_WIDTH-1:0]    incr_pc_addr;
-   logic [ADDR_WIDTH-1:0]    beq_addr;
-   logic [ADDR_WIDTH-1:0]    next_pc_addr;
+   logic [ADDR_WIDTH-1:0]    incr_pc_addr; // current pc incremented by 4 (normal)
+   logic [ADDR_WIDTH-1:0]    beq_addr; // current pc incremented by (imm_ext << 1) (beq branch taken)
+   logic [ADDR_WIDTH-1:0]    next_pc_addr; // sets next cycles pc (either incr_pc_addr or beq_addr) based on branch behaviour
    
    // Originates from programCounter
-   logic [ADDR_WIDTH-1:0]    curr_pc_addr;
+   logic [ADDR_WIDTH-1:0]    curr_pc_addr; // current cycle pc address
    
    // Originates from instrMemory
-   logic [31:0]   instrMem_instrDec_instr;
+   logic [31:0]   instrMem_instrDec_instr; // instruction data retrieved from Instruction Memory (goes to instruction decoder)
    
    // Originates from instrDecoder
    logic [6:0]    opcode;
@@ -54,17 +54,20 @@
    logic             branchCtrl;
    
    // Originates from regFile
-   logic [DATA_WIDTH-1:0]    regFile_ALU_data1;
-   logic [DATA_WIDTH-1:0]    regFile_data2;
+   logic [DATA_WIDTH-1:0]    regFile_ALU_data1; // rs1 data
+   logic [DATA_WIDTH-1:0]    regFile_data2; // rs2 data
    
    // Originates from ALU
-   logic [DATA_WIDTH-1:0]    aluResult;
-   logic                     zeroFlag;
+   logic [DATA_WIDTH-1:0]    aluResult; // result of ALU operation
+   logic                     zeroFlag; // ALU zero flag
    
    // Originates from dataMemory
-   logic [DATA_WIDTH-1:0]     dataMem_mux_data;
+   logic [DATA_WIDTH-1:0]     dataMem_mux_data; // data read from Data Memory
    
-   // Module instantiation
+	//----------------Internal Signals End---------------
+	
+	
+	//----------------Module Instantiation Begin---------
 
    ProgramCounter programCounter(
       .clk_in(clk_in),
@@ -76,7 +79,7 @@
    InstrMemory #(
       .ADDR_WIDTH_POW(ADDR_WIDTH_POW),
       .MEM_DEPTH_POW(INSTR_MEM_DEPTH_POW)
-   )instrMemory (
+   ) instrMemory (
       .addr_in(curr_pc_addr),
       .instr_out(instrMem_instrDec_instr)
    );
@@ -91,9 +94,6 @@
       .funct3_out(funct3),
       .funct7_out(funct7)
    );
-   
-   // Sign-extend IMM
-   assign imm_ext = {{(DATA_WIDTH-12){imm_12b[11]}}, imm_12b};      // Replicates imm_12b's MSB [DATA_WIDTH-12] times (currently 52), then concatenates it ahead of imm_12b
    
    ControlUnit controlUnit(
       .opcode_in(opcode),
@@ -110,7 +110,7 @@
    
    RegFile #(
       .DATA_WIDTH_POW(DATA_WIDTH_POW)
-   )regFile(
+   ) regFile (
       .clk_in(clk_in),
       .reset(reset),
       .regWrite_ctrl(regWrite),
@@ -121,18 +121,10 @@
       .regData1_out(regFile_ALU_data1),
       .regData2_out(regFile_data2)
    );
-   
-   // MUX to switch between IMM & Register 2 Data
-   always_comb begin
-      unique case (aluSrcCtrl)
-         ALU_SRC_REG: mux_alu_data = regFile_data2;
-         ALU_SRC_IMM: mux_alu_data = imm_ext;
-      endcase;
-   end      
 
    ALU #(
       .DATA_WIDTH_POW(DATA_WIDTH_POW)
-   )alu (
+   ) alu (
       .operand1_in(regFile_ALU_data1), 
       .operand2_in(mux_alu_data), 
       .aluOp_in(aluOp), 
@@ -144,7 +136,7 @@
       .DATA_WIDTH_POW(DATA_WIDTH_POW),
       .ADDR_WIDTH_POW(ADDR_WIDTH_POW),
       .MEM_DEPTH_POW(DATA_MEM_DEPTH_POW)
-   )dataMemory (
+   ) dataMemory (
       .clk_in(clk_in),
       .reset(reset),
       .memWrite_ctrl(memWrite),
@@ -153,8 +145,23 @@
       .data_in(regFile_data2),
       .data_out(dataMem_mux_data)
    );
+	
+	//----------------Module Instantiation End---------
+	
+	//----------------Internal Operations Begin--------
    
-   // MUX to switch between ALU & Data Memory Data
+	// Sign-extend IMM to 64-bits
+   assign imm_ext = {{(DATA_WIDTH-12){imm_12b[11]}}, imm_12b};      // Replicates imm_12b's MSB [DATA_WIDTH-12] times (currently 52), then concatenates it ahead of imm_12b
+	
+	// MUX to switch ALU operand2 data source between 2 Data (rs2 data) & instruction IMM Register 
+   always_comb begin
+      unique case (aluSrcCtrl)
+         ALU_SRC_REG: mux_alu_data = regFile_data2;
+         ALU_SRC_IMM: mux_alu_data = imm_ext;
+      endcase;
+   end
+  
+   // MUX to switch the rd data source between Data Memory read data & ALU result
    always_comb begin
       unique case (regSrcCtrl)
          REG_SRC_MEM: mux_reg_data = dataMem_mux_data;
@@ -162,7 +169,7 @@
       endcase;
    end
    
-   // Branch Logic
+   // is_branch_taken logic
    assign branch_mux_ctrl = zeroFlag && branchCtrl;
    
    // ProgramCounter Adder - Increments current Address by 4
@@ -178,5 +185,7 @@
          1'b1: next_pc_addr = beq_addr;
       endcase;
    end      
+	
+	//----------------Internal Operations End--------
    
 endmodule
