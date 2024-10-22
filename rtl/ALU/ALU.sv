@@ -49,6 +49,7 @@ module ALU import ControlSignals::*; #(
       operand2Modified = operand2_in ^ {DATA_WIDTH{subEnable}}; // {64{subEnable}} replicates subEnable 64 times to become
    end
 
+	/* verilator lint_off PINCONNECTEMPTY */
    // Full Adder/Subtractor (terminate carry_out)
    FullAdder64b FA (.operand1_in(operand1_in), .operand2_in(operand2Modified), 
                     .carry_in(subEnable), .result_out(adderResult), .carry_out());
@@ -70,6 +71,7 @@ module ALU import ControlSignals::*; #(
          OP_AND:  result_out = andResult;
          OP_OR:   result_out = orResult;
          OP_ADD:  result_out = adderResult;
+			default: result_out = '0;
       endcase
    end
 

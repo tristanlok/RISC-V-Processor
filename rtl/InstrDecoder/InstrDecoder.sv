@@ -33,6 +33,7 @@ module InstrDecoder(
    // extract format agnostic information
    always_comb begin
    
+		/* verilator lint_off CASEINCOMPLETE */
       // switch type based on opcode
       unique case(instr_in[6:0])
       

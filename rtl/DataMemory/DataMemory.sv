@@ -56,8 +56,8 @@ module DataMemory #(
 
    // calculate word line number from the memory address
    always_comb begin
-      /* verilator lint_off WIDTHTRUNC */ // to implement: check if the calculated wordNumber exceeds the max >MEM_DEPTH-1
-      wordNumber = (MEM_DEPTH_POW-1)'(addr_in >> WORD_BYTES_POW); //divide the byte address by the number of bytes in a word to get the wordline number [CASTED TO AVOID WARNING]
+      // to implement: check if the calculated wordNumber exceeds the max >MEM_DEPTH-1
+      wordNumber = (MEM_DEPTH_POW)'(addr_in >> WORD_BYTES_POW); //divide the byte address by the number of bytes in a word to get the wordline number [CASTED TO AVOID WARNING]
    end
 
    // asynchronous reading

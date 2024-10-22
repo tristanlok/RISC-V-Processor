@@ -35,6 +35,8 @@ module ControlUnit import ControlSignals::*; ( // 1'b0 = OFF 1'b1 = ON
 );
 
    always_comb begin
+	
+		/* verilator lint_off CASEINCOMPLETE */
       unique case(opcode_in)
          7'b0000011: begin //I-TYPE
             // LD Instruction
