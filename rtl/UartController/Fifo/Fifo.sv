@@ -26,10 +26,10 @@ module Fifo #(
    // Output Flags
    output   logic                   outReady_flag,                // FIFO output-ready flag (OR is high when the FIFO is not empty and low when the FIFO is empty)
    output   logic                   inReady_flag,                 // FIFO input-ready flag (IR is high when the FIFO is not full and low when the device is full)
-   output   logic                   halfFull_flag,                // FIFO half full flag
+   output   logic                   halfFull_flag                 // FIFO half full flag
 );
    // Instantiating SRAM block
-   logic [WORD_SIZE-1:0] sram [0:MEM_DEPTH];
+   logic [WORD_SIZE-1:0] sram [0:MEM_DEPTH-1];
    
    // Buffer/Latching Register
    logic [WORD_SIZE-1:0] register;
@@ -41,34 +41,34 @@ module Fifo #(
    // Status-Flag Logic
    
    always_ff @(posedge writeClk_in) begin
-      if (!rstN) begin                       // on reset
+      if (!rstN) begin                          // On reset behaviour
          inReady_flag <= '0;
       end else begin
-         if ((readPtr-1) == writePtr) begin     // if full
+         if ((readPtr-1) == writePtr) begin     // If FIFO is full
             inReady_flag <= '0;
-         end else
+         end else begin
             inReady_flag <= '1;
          end
       end
    end
    
    always_ff @(posedge readClk_in) begin
-      if (!rstN) begin                       // on reset
+      if (!rstN) begin                          // On reset behaviour
          outReady_flag <= '0;
       end else begin
-         if (readPtr == writePtr) begin      // if empty
+         if (readPtr == writePtr) begin         // If FIFO is empty
             outReady_flag <= '0;
-         end else
+         end else begin
             outReady_flag <= '1;
          end
       end
    end
    
-   always_latch begin
-      if(!rstN) begin         // on reset
+   always_comb begin
+      if(!rstN) begin                                          // On reset behaviour
          halfFull_flag  = '0;
       end else begin
-         if ((writePtr-readPtr) >= (MEM_DEPTH>>1)) begin       // if the difference is equal or greater than half of the depth (16/2)
+         if ((writePtr-readPtr) >= (MEM_DEPTH>>1)) begin       // If the difference is equal or greater than half of the depth (16/2)
             halfFull_flag = '1;
          end else begin
             halfFull_flag = '0;
@@ -79,30 +79,29 @@ module Fifo #(
    
    // Synchronous Read + Control
    always_ff @(posedge readClk_in) begin
-      if (!rstN) begin
-         writePtr <= '0;
-      end else if (readEn1_in && readEn2_in && !outReady_flag) begin
-            register <= sram[readPtr];
-            if (readPtr >= (WORD_SIZE-1)) begin
-               readPtr <= '0;
-            end else begin
-               readPtr <= readPtr + 1;
-            end
+      if (!rstN) begin                                                  // On reset behaviour
+         readPtr <= '0;
+      end else if (readEn1_in && readEn2_in && !outReady_flag) begin    // If Read Enables are active and FIFO is not empty
+         register <= sram[readPtr];                                     // Read current pointer location into register
+         if (readPtr >= (WORD_SIZE-1)) begin                            // If read pointer is on the last position, circle back
+            readPtr <= '0;
+         end else begin
+            readPtr <= readPtr + 1;                                     // Increments read pointer by 1
          end
       end
    end
    
    // Synchronous Write + Control
    always_ff @(posedge writeClk_in) begin
-      if (!rstN) begin
+      if (!rstN) begin                                                  // On reset behaviour
          writePtr <= '0;
       end else begin
-         if (writeEn1_in && writeEn2_in && !inReady_flag) begin
-            sram[writePtr] <= data_in;
-            if (writePtr >= (WORD_SIZE-1)) begin
+         if (writeEn1_in && writeEn2_in && !inReady_flag) begin         // If Write Enables are active and FIFO is not full
+            sram[writePtr] <= data_in;                                  // Write data into current SRAM write location
+            if (writePtr >= (WORD_SIZE-1)) begin                        // If write pointer is on the last position, circle back
                writePtr <= '0;
             end else begin
-               writePtr <= writePtr + 1;
+               writePtr <= writePtr + 1;                                // Increments write pointer by 1
             end
          end
       end
