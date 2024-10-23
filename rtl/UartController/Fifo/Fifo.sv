@@ -20,16 +20,13 @@ module Fifo #(
    input    logic                   readEn1_in, readEn2_in,       // Read Enables (Both must be active)
    input    logic                   writeClk_in,                  // Free-running Write Clock
    input    logic                   writeEn1_in, writeEn2_in,     // Write Enables (Both must be active)
-   input    logic                   dafN_in                       // Active low Define Almost Full
    
    output   logic [WORD_SIZE-1:0]   data_out,                     // 8-bit data output (MSB first)
    
    // Output Flags
-   output   logic                   outReady_flag,                // FIFO output-ready flag
-   output   logic                   inReady_flag,                 // FIFO input-ready flag
+   output   logic                   outReady_flag,                // FIFO output-ready flag (OR is high when the FIFO is not empty and low when the FIFO is empty)
+   output   logic                   inReady_flag,                 // FIFO input-ready flag (IR is high when the FIFO is not full and low when the device is full)
    output   logic                   halfFull_flag,                // FIFO half full flag
-   output   logic                   almostFull_flag,              // FIFO almost full flag
-   output   logic                   empty_flag                    // FIFO empty flag
 );
    // Instantiating SRAM block
    logic [WORD_SIZE-1:0] sram [0:MEM_DEPTH];
@@ -41,17 +38,73 @@ module Fifo #(
    logic [MEM_DEPTH_POW-1:0]  readPtr;
    logic [MEM_DEPTH_POW-1:0]  writePtr;
    
+   // Status-Flag Logic
    
-   // Reset Logic (Reset should be held for 4 clock cycles)
-   always_ff @(posedge readClk_in) begin
-      if (!rstN) begin
-         readPtr <= '0;
+   always_ff @(posedge writeClk_in) begin
+      if (!rstN) begin                       // on reset
+         inReady_flag <= '0;
+      end else begin
+         if ((readPtr-1) == writePtr) begin     // if full
+            inReady_flag <= '0;
+         end else
+            inReady_flag <= '1;
+         end
       end
    end
    
+   always_ff @(posedge readClk_in) begin
+      if (!rstN) begin                       // on reset
+         outReady_flag <= '0;
+      end else begin
+         if (readPtr == writePtr) begin      // if empty
+            outReady_flag <= '0;
+         end else
+            outReady_flag <= '1;
+         end
+      end
+   end
+   
+   always_latch begin
+      if(!rstN) begin         // on reset
+         halfFull_flag  = '0;
+      end else begin
+         if ((writePtr-readPtr) >= (MEM_DEPTH>>1)) begin       // if the difference is equal or greater than half of the depth (16/2)
+            halfFull_flag = '1;
+         end else begin
+            halfFull_flag = '0;
+         end
+      end
+   end
+   
+   
+   // Synchronous Read + Control
+   always_ff @(posedge readClk_in) begin
+      if (!rstN) begin
+         writePtr <= '0;
+      end else if (readEn1_in && readEn2_in && !outReady_flag) begin
+            register <= sram[readPtr];
+            if (readPtr >= (WORD_SIZE-1)) begin
+               readPtr <= '0;
+            end else begin
+               readPtr <= readPtr + 1;
+            end
+         end
+      end
+   end
+   
+   // Synchronous Write + Control
    always_ff @(posedge writeClk_in) begin
       if (!rstN) begin
          writePtr <= '0;
+      end else begin
+         if (writeEn1_in && writeEn2_in && !inReady_flag) begin
+            sram[writePtr] <= data_in;
+            if (writePtr >= (WORD_SIZE-1)) begin
+               writePtr <= '0;
+            end else begin
+               writePtr <= writePtr + 1;
+            end
+         end
       end
    end   
    
