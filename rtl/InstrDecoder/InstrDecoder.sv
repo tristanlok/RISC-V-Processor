@@ -47,6 +47,17 @@ module InstrDecoder(
             rs2_out     = '0;
             funct7_out  = '0;
          end
+			
+			7'b0010011: begin //ADDI
+				rd_out      = instr_in[11:7];
+				funct3_out  = instr_in[14:12];
+				rs1_out     = instr_in[19:15];
+				imm_out     = instr_in[31:20];
+				
+				// Don't Care
+				rs2_out     = '0;
+				funct7_out  = '0;
+			end
          
          7'b0100011: begin //S-TYPE
             funct3_out  = instr_in[14:12];
