@@ -1,4 +1,4 @@
-// FOR FORMAL VERIFICATION ONLY | SYMBIYOSYS DOES NOT SUPPORT PACKAGES
+	// FOR FORMAL VERIFICATION ONLY | SYMBIYOSYS DOES NOT SUPPORT PACKAGES
 /*
 typedef enum logic [2:0] {
    OP_ADD = 3'b111,
@@ -48,7 +48,17 @@ module ControlUnit import ControlSignals::*; ( // 1'b0 = OFF 1'b1 = ON
             regSrcCtrl_out    = REG_SRC_MEM;
             branchCtrl_out    = 1'b0;
          end
-         
+			
+			7'b0010011: begin //ADDI instruction
+				aluSrcCtrl_out    = ALU_SRC_IMM;
+            memRead_out       = 1'b0;
+            memWrite_out      = 1'b0;
+            aluOp_out         = OP_ADD;
+            regWrite_out      = 1'b1;
+            regSrcCtrl_out    = REG_SRC_ALU;
+            branchCtrl_out    = 1'b0;
+			end
+			
          7'b0100011: begin //S-TYPE
             // SD Instruction
             aluSrcCtrl_out    = ALU_SRC_IMM;
