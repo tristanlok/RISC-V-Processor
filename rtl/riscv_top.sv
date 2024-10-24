@@ -11,10 +11,19 @@
    parameter   INSTR_MEM_DEPTH_POW = 10,
    
    // Parameter to configure the depth of Instruction Memory (in terms of powers of 2)
-   parameter   DATA_MEM_DEPTH_POW = 12
+   parameter   DATA_MEM_DEPTH_POW = 12,
+	
+	// Parameter for verification
+	parameter	VERIFY_MODE	= 0
  )(
     input   logic    clk_in,
-    input   logic    reset
+    input   logic    rstN,
+	 
+	 // Exposed Internal Signals for UVM testbench
+	 
+	 // Instruction Memory Emulator Interface
+	 input	logic		curr_instr,
+	 
 );
    
 	//----------------Internal Signals Begin---------------
@@ -33,7 +42,7 @@
    logic [ADDR_WIDTH-1:0]    curr_pc_addr; // current cycle pc address
    
    // Originates from instrMemory
-   logic [31:0]   instrMem_instrDec_instr; // instruction data retrieved from Instruction Memory (goes to instruction decoder)
+   logic [31:0]   curr_instr; // instruction data retrieved from Instruction Memory (goes to instruction decoder)
    
    // Originates from instrDecoder
    logic [6:0]    opcode;
@@ -71,21 +80,28 @@
 
    ProgramCounter programCounter(
       .clk_in(clk_in),
-      .reset(reset),
+      .rstN(rstN),
       .instr_in(next_pc_addr),
       .instr_out(curr_pc_addr)
    );
    
-   InstrMemory #(
-      .ADDR_WIDTH_POW(ADDR_WIDTH_POW),
-      .MEM_DEPTH_POW(INSTR_MEM_DEPTH_POW)
-   ) instrMemory (
-      .addr_in(curr_pc_addr),
-      .instr_out(instrMem_instrDec_instr)
-   );
+	generate
+		if (VERIFY_MODE) begin
+			
+		
+		end else begin
+			InstrMemory #(
+				.ADDR_WIDTH_POW(ADDR_WIDTH_POW),
+				.MEM_DEPTH_POW(INSTR_MEM_DEPTH_POW)
+			) instrMemory (
+				.addr_in(curr_pc_addr),
+				.instr_out(curr_instr)
+			);
+		end
+	endgenerate
    
    InstrDecoder instrDecoder(
-      .instr_in(instrMem_instrDec_instr),
+      .instr_in(curr_instr),
       .opcode_out(opcode),
       .rs1_out(rs1),
       .rs2_out(rs2),
@@ -112,7 +128,7 @@
       .DATA_WIDTH_POW(DATA_WIDTH_POW)
    ) regFile (
       .clk_in(clk_in),
-      .reset(reset),
+      .rstN(rstN),
       .regWrite_ctrl(regWrite),
       .rs1_in(rs1),
       .rs2_in(rs2),
@@ -132,19 +148,26 @@
       .zeroFlag_out(zeroFlag)
    );
    
-   DataMemory #(
-      .DATA_WIDTH_POW(DATA_WIDTH_POW),
-      .ADDR_WIDTH_POW(ADDR_WIDTH_POW),
-      .MEM_DEPTH_POW(DATA_MEM_DEPTH_POW)
-   ) dataMemory (
-      .clk_in(clk_in),
-      .reset(reset),
-      .memWrite_ctrl(memWrite),
-      .memRead_ctrl(memRead),
-      .addr_in(aluResult),
-      .data_in(regFile_data2),
-      .data_out(dataMem_mux_data)
-   );
+	generate
+		if (VERIFY_MODE) begin
+		
+		
+		end else begin
+			DataMemory #(
+				.DATA_WIDTH_POW(DATA_WIDTH_POW),
+				.ADDR_WIDTH_POW(ADDR_WIDTH_POW),
+				.MEM_DEPTH_POW(DATA_MEM_DEPTH_POW)
+			) dataMemory (
+				.clk_in(clk_in),
+				.rstN(rstN),
+				.memWrite_ctrl(memWrite),
+				.memRead_ctrl(memRead),
+				.addr_in(aluResult),
+				.data_in(regFile_data2),
+				.data_out(dataMem_mux_data)
+			);
+		end
+	endgenerate
 	
 	//----------------Module Instantiation End---------
 	
