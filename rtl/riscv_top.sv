@@ -16,13 +16,15 @@
 	// Parameter for verification
 	parameter	VERIFY_MODE	= 0
  )(
-    input   logic    clk_in,
-    input   logic    rstN,
+    input   logic    		clk_in,
+    input   logic    		rstN,
 	 
 	 // Exposed Internal Signals for UVM testbench
 	 
 	 // Instruction Memory Emulator Interface
-	 input	logic		curr_instr,
+	 input	logic [31:0]	curr_instr_in
+	 
+	 output	logic
 	 
 );
    
@@ -85,9 +87,10 @@
       .instr_out(curr_pc_addr)
    );
    
+	// If verify mode, drive the instructions with Instruction Input instead of Instruction Memory
 	generate
 		if (VERIFY_MODE) begin
-			
+			assign curr_instr = curr_instr_in;			
 		
 		end else begin
 			InstrMemory #(
@@ -148,26 +151,21 @@
       .zeroFlag_out(zeroFlag)
    );
    
-	generate
-		if (VERIFY_MODE) begin
-		
-		
-		end else begin
-			DataMemory #(
-				.DATA_WIDTH_POW(DATA_WIDTH_POW),
-				.ADDR_WIDTH_POW(ADDR_WIDTH_POW),
-				.MEM_DEPTH_POW(DATA_MEM_DEPTH_POW)
-			) dataMemory (
-				.clk_in(clk_in),
-				.rstN(rstN),
-				.memWrite_ctrl(memWrite),
-				.memRead_ctrl(memRead),
-				.addr_in(aluResult),
-				.data_in(regFile_data2),
-				.data_out(dataMem_mux_data)
-			);
-		end
-	endgenerate
+
+	DataMemory #(
+		.DATA_WIDTH_POW(DATA_WIDTH_POW),
+		.ADDR_WIDTH_POW(ADDR_WIDTH_POW),
+		.MEM_DEPTH_POW(DATA_MEM_DEPTH_POW)
+	) dataMemory (
+		.clk_in(clk_in),
+		.rstN(rstN),
+		.memWrite_ctrl(memWrite),
+		.memRead_ctrl(memRead),
+		.addr_in(aluResult),
+		.data_in(regFile_data2),
+		.data_out(dataMem_mux_data)
+	);
+
 	
 	//----------------Module Instantiation End---------
 	
