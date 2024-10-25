@@ -1,0 +1,45 @@
+LD:
+reg[rd] == ref_memory[ref_reg[rs1] + ref_imm] 
+AND 
+dataMem_address_in == ref_reg[rs1] + ref_imm
+ 
+SD:
+dataMem_data_in == ref_reg[rs2] 
+AND 
+dataMem_address_in == ref_reg[rs1] + ref_imm
+
+ADDI:
+reg[rd] == ref_reg[rs1] + ref_imm
+
+ADD:
+reg[rd] == ref_reg[rs1] + ref_reg[rs2]
+
+SUB:
+reg[rd] == ref_reg[rs1] - ref_reg[rs2]
+
+AND:
+reg[rd] == reg[rs1] & reg[rs2]
+
+OR:
+reg[rd] == reg[rs1] | reg[rs2]
+
+BEQ:
+if(reg[rs1] == reg[rs2])
+    pc_next == pc_curr += (imm << 1)
+    
+    
+    
+UVM FLOW:
+
+1. Sequence generates transaction which is a binary instruction
+2. Sequencer in instr_agent receives transaction from Sequence and passes transaction to Driver
+3. Driver converts transaction into 32-bit binary instruction and passes to DUT via inst_in interface and to the reference model
+4. DUT executes the instruction 
+5. Monitor observes data memory, PC and next PC, and reset signals through the interface on the negedge and samples regfile on the next posedge wait #0 delta step to sample
+6. Monitor packs all into a transaction and gives it a transaction ID from the global counter
+7. Reference model receives the same instruction from the drive and executes
+8. Based on the instruction, the reference model dumps the necessary regfile and memory data and packs it into an instruction and gives it the same ID from the global counter
+9. Both the monitor and the reference model indicate they've created the transaction and raise a UVM_event to increment the transaction ID global counter
+10. The scoreboard receives the transaction from the monitor and from the reference model and compares them, recording results for post simulation analysis
+11. The monitor also sends its transaction to the coverage collector which updates the simulation coverage as necessary
+12. Cycle repeats
